@@ -1,24 +1,65 @@
-\documentclass[12pt]{article}
+\documentclass[12pt,a4paper]{report}
+\usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
-\usepackage{amsfonts}
+\usepackage{newlfont}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{listings}
 \graphicspath{ {./pic/} }
 
-
-\title{La mia fantastica tesi!\\[1ex] \large Un titolo placeolder ottimistico}
-\author{Mattia Girolimetto}
-\date{2023 idk} % TODO
-
-\lstset{language=[Objective]Caml}
-\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
-
-\makeindex
 \begin{document}
 
-\maketitle
+\begin{titlepage}
+  \begin{center}
+    {{
+      \Large{\textsc{Alma Mater Studiorum $\cdot$ Universit\`a di Bologna}}
+    }} \rule[0.1cm]{15.8cm}{0.1mm}
+    \rule[0.5cm]{15.8cm}{0.6mm}
+    {\small{\bf SCUOLA DI SCIENZE\\
+    Corso di Laurea in Informatica}}
+  \end{center}
+  \vspace{15mm}
+  \begin{center}
+    {\LARGE{\bf LA MIA FANTASTICA}}\\
+    \vspace{3mm}
+    {\LARGE{\bf OTTIMISTICA}}\\
+    \vspace{3mm}
+    {\LARGE{\bf TESI}}\\
+  \end{center}
+  \vspace{40mm}
+  \par
+  \noindent
+  \begin{minipage}[t]{0.47\textwidth}
+  {\large{\bf Relatore:\\
+  Chiar.mo Prof.\\
+  Claudio Sacerdoti Coen}}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.47\textwidth}\raggedleft
+  {\large{\bf Presentata da:\\
+  Mattia Girolimetto}}
+  \end{minipage}
+  \vspace{20mm}
+  \begin{center}
+  {\large{\bf I Appello di Laurea\\%inserire il numero della sessione in cui ci si laurea
+  Anno Accademico 2022-2023}}%inserire l'anno accademico a cui si è iscritti
+  \end{center}
+\end{titlepage}
+
+
 \tableofcontents
+
+\chapter{Introduzione}
+\section{Dimostratori Interattivi di Teoremi, Matita e Dedukti}
+Un dimostratore interattivo di teoremi (o \textit{proof assistant}) è un software 
+che permette all'utente di costruire e verificare delle dimostrazioni matematiche formali.
+Presa in input una prova espressa utilizzando uno specifico linguaggio 
+formale, simile ad un linguaggio di programmazione, il software è in grado di verificarne
+la correttezza.
+In questo modo si possono costruire dimostrazioni in modo interattivo, controllando prograssivamente
+la corretezza di ogni passo.
+Uno dei benefici chiave dell'usare un dimostratore interattivo automatico è l'abilità di 
+eliminare gli errori e le ambiguità che possono comparire nelle dimostrazioni tradizionali.
 
 
 
