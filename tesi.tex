@@ -75,6 +75,36 @@ Dedukti (che significa "dedurre" in esperanto) è un \textit{logical framework}
 sviluppato da alcuni ricercatori del INRIA, basato sul \textit{calcolo lambda\-pi}.
 Il software è open source, anch'esso scritto nel linguaggio di programmazione OCAML
 e distribuito secondo i termini della CeCILL\-B License.
+
+\subsection{Interoperabilità tra sistemi}
+Il numero di proof assistant è aumentato nel tempo. Ciò porta sicuramente un
+beneficio alla comunità scientifica, in quanto dimostra un crescente interesse
+verso lo sviluppo di questi strumenti. Tuttavia, unito alla forte diversità che
+li caratterizza individualmente, questo fenomeno porta inevitabilmente
+ad una \textit{frammentazione} della conoscenza. Non è quasi mai possibile infatti
+per un utente dimostrare la veridicità di un teorema usando un proof assistant
+e usare la stessa dimostrazione in un altro di questi tool. Il problema è dovuto
+a fattori facilmente aggirabili, come ad esempio la differenza sintattica dei due
+linguaggi proprietari, ma anche a fattori non facilmente aggirarabili, come nel
+caso in cui i due tool usino calcoli con diversi livelli di espressività.
+
+Nasce dunque l'esigenza di favorire l'interoperabilità tra questi sistemi, in
+modo da arginare questo problema e favorire lo sviluppo scientifico. 
+A tale scopo, nel tempo sono state aggiunte ad alcuni di tool delle funzionalità
+di export, per permettere all'utente di ottenere la propria dimostrazione in un
+formato compatibile con un altro software.
+
+\subsection{Krajono}
+Attorno al 2018 un team di sviluppatori del \textit{Institut national de recherche
+en informatique et en automatique} %TODO check 
+ha sviluppato un fork di Matita con la possibilità di esportare le dimostrazioni
+in un formato compatibile con Dedukti. Questo fork è tutt'ora distribuito 
+pubblicamente con il nome di \textit{Krajono} ("matita" in esperanto) anche se 
+non è stato aggiornato con gli ultimi sviluppi del Matita baseline.
+
+
+
+
 \chapter{Parte tecnica} % TODO
 
 \chapter{Conclusioni}
