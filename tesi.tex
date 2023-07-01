@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{newlfont}
 \usepackage{amsmath}
+\usepackage{amsfonts}
 \usepackage{graphicx}
 \usepackage{listings}
 \graphicspath{ {./pic/} }
@@ -52,6 +53,95 @@
 \chapter{Introduzione}
 
 \section{Teoria dei Tipi}
+\subsection{Il paradosso di Russel}
+Quando il matematico inglese Bertrand Russel propose il paradosso oggi chiamato a suo 
+nome, nei primi anni del $'900$ scatenò quella che venne definita come la\textit{crisi
+dei fondamenti matematici}. Il paradosso molto semplicemente evidenziava come la teoria
+degli insiemi usata fino a quel punto (oggi definita teoria degli insiemi \textit{naive})
+rendesse possibile definire un insieme come il seguente
+\begin{center}
+  $X = \{Y | Y \notin Y \}$
+\end{center}
+
+La contraddizione avviene quando ci si domanda se $X \in X$, in quanto se $X$ appartenese
+a sé stesso allora non apparterrebbe all'insieme degli insiemi che appartengono loro stessi,
+ovvero $X$ stesso. In formule:
+\begin{center}
+  $X \in X \Leftrightarrow X \notin X$
+\end{center}
+
+Una delle strategie pensate dunque per aggirare questo paradosso fu la \textit{teoria dei tipi}.
+
+\subsection{La Teoria dei Tipi}
+La \textit{teoria dei tipi} è una branca della matematica, della logica, dell'informatica
+teorica il cui obbiettivo è quello di studiare i così detti \textit{type system}, ovvero
+insiemi di regole che associano una proprietà chiamata \textit{tipo} ad degli oggetti
+chiamati \textit{termini}. Nonostante siano state proposte molteplici teorie, le principali
+emerse sono due: il \textit{$\lambda$-calcolo tipato} di Alonozo Church e la \textit{teoria
+dei tipi intuizionistica} di Per Martin-L{\"o}f.
+
+Intuitivamente, assegnare un tipo ad un termine significa assegnare al termine un'etichetta
+che rappresenta la natura del termine stesso. Esempi comuni possono essere: 
+\begin{itemize}
+  \item $42$ è un numero naturale 
+  \item $-5$ è un numero intero
+  \item $falso$ è un valore di verità 
+\end{itemize}
+
+Formalmente si usa rappresentare queste espressioni separando il termine dal tipo usando
+il simbolo '$:$'. Gli esempi precedenti diventano quindi:
+\begin{itemize}
+  \item $42$ $:$ $\mathbb{N}$
+  \item $-5$ $:$ $\mathbb{Z}$
+  \item $falso$ $:$ $\mathbb{B}$ 
+\end{itemize}
+
+Nella teoria dei tipi, anche le funzioni possono sono termini, e quindi possono essere
+a loro volta tipizzate. Ad esempio, la seguente funzione rappresentata con un $\lambda$-termine
+appartenente al $\lambda$-calcolo di Church 
+\begin{center}
+  $(\lambda$ $x$ $:$ $\mathbb{N}$ $.$ $x + x)$
+\end{center}
+
+è definita da $\mathbb{N}$ a $\mathbb{N}$, e per tanto ha tipo $\mathbb{N} \rightarrow \mathbb{N}$
+
+\subsection{L'isomorfismo di Curry-Howard}
+Sempre durante il '900 il matematico e logico Haskell Curry e il logico William Alvin Howard,
+scoprono una corrispondenza diretta tra prove formali e programmi. In particolare notano che
+gli operatori logici e le regole usate durante una dimostrazione formale sono equivalenti a
+tipi e ai costrutti usati nei programmi scritti usando linguaggi di programmazione funzionali.
+Ne segue anche che il verificare la correttezza di una prova è analogo al verificare la correttezza
+degli assegnamenti di tipo di un programma (\textit{type checking}). Nella sua formulazione più
+generale, l'isomorfismo di Curry-Howard può essere riassunto con la seguente tabella:
+
+\begin{center}
+  \begin{tabular}{ | c | c |}
+    \hline
+    \textbf{Logica} & \textbf{Informatica} \\
+    \hline
+    $\top$ & Tipo unit \\
+    \hline
+    $\bot $ & Tipo vuoto/void \\
+    \hline
+   $\wedge$ & Tipi prodotto \\  
+    \hline
+   $\vee$ & Tipi somma \\
+    \hline
+   $\Rightarrow$ & Tipi funzione \\ 
+    \hline
+   $\exists$ & Tipi $\Sigma$ \\ 
+    \hline
+    $\forall $ & Tipi $\Pi$ \\ 
+    \hline
+
+  \end{tabular}
+\end{center}
+
+\subsection{La teoria dei tipi nella pratica}
+La teoria dei tipi trova quindi grande applicazione nel campo dell'informatica grazie
+allo studio e allo sviluppo dei linguaggi di programmazione. Inoltre, grazie all'isomorifismo
+di Curry-Howard, ha permesso lo sviluppo di dimostratori automatici di teoremi e
+di dimostratori interattivi di teoremi, i quali sono soggetto di questa tesi.
 
 \section{Dimostratori Interattivi di Teoremi}
 Un dimostratore interattivo di teoremi (o \textit{proof assistant}) è un software 
@@ -76,6 +166,8 @@ sviluppato da alcuni ricercatori del INRIA, basato sul \textit{calcolo lambda\-p
 Il software è open source, anch'esso scritto nel linguaggio di programmazione OCAML
 e distribuito secondo i termini della CeCILL\-B License.
 
+\section{Interoperabilità Dedukti\-Matita}
+
 \subsection{Interoperabilità tra sistemi}
 Il numero di proof assistant è aumentato nel tempo. Ciò porta sicuramente un
 beneficio alla comunità scientifica, in quanto dimostra un crescente interesse
@@ -94,7 +186,7 @@ A tale scopo, nel tempo sono state aggiunte ad alcuni di tool delle funzionalit�
 di export, per permettere all'utente di ottenere la propria dimostrazione in un
 formato compatibile con un altro software.
 
-\subsection{Krajono}
+\subsection{Da Matita a Dedukti}
 Attorno al 2018 un team di sviluppatori del \textit{Institut national de recherche
 en informatique et en automatique} %TODO check 
 ha sviluppato un fork di Matita con la possibilità di esportare le dimostrazioni
@@ -102,10 +194,22 @@ in un formato compatibile con Dedukti. Questo fork è tutt'ora distribuito
 pubblicamente con il nome di \textit{Krajono} ("matita" in esperanto) anche se 
 non è stato aggiornato con gli ultimi sviluppi del Matita baseline.
 
-
+\subsection{Da Dedukti a Matita}
+Come visto nel paragrafo precedente, usando Krajono è possibile esportare 
+del codice Matita verso Dedukti, tuttavia non è possibile fare il contrario,
+in quanto ne Krajono, ne Dedukti stesso godono di questa funzionalità.
+L'export è dunque a senso unico, e qualcosa di esportato non può essere
+re\-importato in Matita. Il lavoro di questa tesi è proprio il seguente:
+rendere Matita capace di esportare ed importare codice da e verso Dedukti.
+Con un export a doppio senso gli sviluppatori Matita saranno in grado 
+di usare dimostrazioni Dedukti e vice versa.
 
 
 \chapter{Parte tecnica} % TODO
+\section{Export: da Matita a Dedukti}
+
+
+
 
 \chapter{Conclusioni}
 
