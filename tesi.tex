@@ -48,15 +48,20 @@
 \end{titlepage}
 
 
+\begin{abstract}
+\end{abstract}
+
 \tableofcontents
 
 \chapter{Introduzione}
 
-\section{Teoria dei Tipi}
+\chapter{Proof Assistant e Interoperabilità}
+
+\section{La Teoria dei Tipi}
 \subsection{Il paradosso di Russel}
 Quando il matematico inglese Bertrand Russel propose il paradosso oggi chiamato a suo 
-nome, nei primi anni del $'900$ scatenò quella che venne definita come la\textit{crisi
-dei fondamenti matematici}. Il paradosso molto semplicemente evidenziava come la teoria
+nome, nei primi anni del $'900$ scatenò quella che venne definita \textit{crisi
+dei fondamenti matematici}. Il paradosso semplicemente evidenziava come la teoria
 degli insiemi usata fino a quel punto (oggi definita teoria degli insiemi \textit{naive})
 rendesse possibile definire un insieme come il seguente
 \begin{center}
@@ -96,7 +101,7 @@ il simbolo '$:$'. Gli esempi precedenti diventano quindi:
   \item $falso$ $:$ $\mathbb{B}$ 
 \end{itemize}
 
-Nella teoria dei tipi, anche le funzioni possono sono termini, e quindi possono essere
+Nella teoria dei tipi, anche le funzioni sono termini e possono essere
 a loro volta tipizzate. Ad esempio, la seguente funzione rappresentata con un $\lambda$-termine
 appartenente al $\lambda$-calcolo di Church 
 \begin{center}
@@ -106,13 +111,14 @@ appartenente al $\lambda$-calcolo di Church
 è definita da $\mathbb{N}$ a $\mathbb{N}$, e per tanto ha tipo $\mathbb{N} \rightarrow \mathbb{N}$
 
 \subsection{L'isomorfismo di Curry-Howard}
-Sempre durante il '900 il matematico e logico Haskell Curry e il logico William Alvin Howard,
-scoprono una corrispondenza diretta tra prove formali e programmi. In particolare notano che
-gli operatori logici e le regole usate durante una dimostrazione formale sono equivalenti a
-tipi e ai costrutti usati nei programmi scritti usando linguaggi di programmazione funzionali.
-Ne segue anche che il verificare la correttezza di una prova è analogo al verificare la correttezza
-degli assegnamenti di tipo di un programma (\textit{type checking}). Nella sua formulazione più
-generale, l'isomorfismo di Curry-Howard può essere riassunto con la seguente tabella:
+Sempre durante il '900 i logici Haskell Curry e William Alvin Howard, scoprirono
+una corrispondenza diretta tra prove formali e programmi. In particolare notarono
+che gli operatori logici e le regole usate durante una dimostrazione formale
+sono equivalenti a tipi e costrutti usati nei programmi scritti usando linguaggi
+di programmazione funzionali. Ne segue che il verificare la correttezza di una
+prova è analogo al verificare la correttezza degli assegnamenti di tipo di un
+programma (\textit{type checking}). Nella sua formulazione più generale,
+l'isomorfismo di Curry-Howard può essere riassunto con la seguente tabella:
 
 \begin{center}
   \begin{tabular}{ | c | c |}
@@ -138,10 +144,11 @@ generale, l'isomorfismo di Curry-Howard può essere riassunto con la seguente ta
 \end{center}
 
 \subsection{La teoria dei tipi nella pratica}
-La teoria dei tipi trova quindi grande applicazione nel campo dell'informatica grazie
-allo studio e allo sviluppo dei linguaggi di programmazione. Inoltre, grazie all'isomorifismo
-di Curry-Howard, ha permesso lo sviluppo di dimostratori automatici di teoremi e
-di dimostratori interattivi di teoremi, i quali sono soggetto di questa tesi.
+La teoria dei tipi trova quindi grande applicazione nel campo dell'informatica
+grazie allo studio e allo sviluppo dei linguaggi di programmazione. Inoltre,
+grazie all'isomorifismo di Curry-Howard, ha permesso lo sviluppo di dimostratori
+automatici di teoremi e di dimostratori interattivi di teoremi, i quali sono
+soggetto di questa tesi.
 
 \section{Dimostratori Interattivi di Teoremi}
 Un dimostratore interattivo di teoremi (o \textit{proof assistant}) è un software 
@@ -162,11 +169,11 @@ ed è rilasciato secondo i termini della GNU General Public Licence.
 
 \subsection{Dedukti}
 Dedukti (che significa "dedurre" in esperanto) è un \textit{logical framework}
-sviluppato da alcuni ricercatori del INRIA, basato sul \textit{calcolo lambda\-pi}.
+sviluppato da alcuni ricercatori del INRIA, basato sul \textit{calcolo lambda-pi}.
 Il software è open source, anch'esso scritto nel linguaggio di programmazione OCAML
-e distribuito secondo i termini della CeCILL\-B License.
+e distribuito secondo i termini della CeCILL-B License.
 
-\section{Interoperabilità Dedukti\-Matita}
+\section{Interoperabilità Dedukti-Matita}
 
 \subsection{Interoperabilità tra sistemi}
 Il numero di proof assistant è aumentato nel tempo. Ciò porta sicuramente un
@@ -186,28 +193,82 @@ A tale scopo, nel tempo sono state aggiunte ad alcuni di tool delle funzionalit�
 di export, per permettere all'utente di ottenere la propria dimostrazione in un
 formato compatibile con un altro software.
 
-\subsection{Da Matita a Dedukti}
+\chapter{Da Matita a Dedukti}
+\section{Krajono}
 Attorno al 2018 un team di sviluppatori del \textit{Institut national de recherche
 en informatique et en automatique} %TODO check 
 ha sviluppato un fork di Matita con la possibilità di esportare le dimostrazioni
 in un formato compatibile con Dedukti. Questo fork è tutt'ora distribuito 
 pubblicamente con il nome di \textit{Krajono} ("matita" in esperanto) anche se 
 non è stato aggiornato con gli ultimi sviluppi del Matita baseline.
+Il primo passo del mio lavoro è stato quello di integrare il codice di Krajono
+dentro a Matita.
 
-\subsection{Da Dedukti a Matita}
-Come visto nel paragrafo precedente, usando Krajono è possibile esportare 
+\subsection{Krajono: funzionamento dell'esportazione}
+Il processo di esportazione prevede l'analisi del tipo e della struttura di 
+ciascuna istruzione del file Matita. Queste passano per un processo di 
+\textit{scanning} e \textit{parsing}, fino a diventare oggetti contenti i
+termini, in un albero astratto. Questi vegono poi passati singolarmente al
+modulo responsabile per la conversione. Durante questo processo vengono
+analizzate la struttura e le caratteristiche di ciascun termine, per poi
+costruirne uno rappresentante una istruzione Dedukti il più possibile
+equivalente. La traduzione cerca quindi di essere una trasformazione uno a uno,
+dove è possibile.
+
+\subsection{Krajono: export da linea di comando}
+Matitac è il compilatore da linea di comando di Matita. Se lo si lancia compila
+tutti i file con estensione \textit{.ma} presenti nella directory corrente. 
+Opzionalmente, passando come argomento il nome di un file, è possibile anche 
+compilarlo singolarmente. 
+
+Krajono fornisce la possibilità di esportare il codice Matita passando il flag
+\texttt{-extract\_dedukti} a Matitac, sia lavorando con un unico file, sia con
+un'intera directory. Successivamente uno potrà trovare i file \textit{.dk} 
+relativi al codice matita esportato nella directory dei sorgenti.
+
+\subsection{Krajono: integrazione in Matita}
+Per fare il porting della funzionalità, invece di aprire una \textit{pull
+request} da una repository Git all'altra, si è preferito copiare e addattare i
+singoli file sorgente responsabili dell'esportazione.
+
+\paragraph{Struttura del sorgente}
+Il codice per implemetare la funzionalità in Krajono è diviso in tre moduli OCaml:
+\begin{itemize}
+  \item \textit{dedukti}: contenente le definizioni di costanti e funzioni
+    di utilità, invocate dal codice dell'export.
+  \item \textit{deduktiExtraction}: contenente la logica del vero e proprio 
+    export.
+  \item \textit{deduktiPrint}: contenente semplici funzioni per stampare a 
+    schermo gli oggetti usati nell'export.
+\end{itemize}
+
+Durante la compilazione di un file, quando il flag \texttt{-extract\_dedukti} è
+attivo, il motore di Matita/Krajono avvia l'esportazione chiamando una funzione
+dal modulo deduktiExtraction durante la fase di costruzione dell'albero astratto.
+
+\paragraph{Integrazione in Matita}
+Il codice interessato dunque è poco dipendente dal resto del codice di Matita,
+quindi il porting della funzionalità si è ridotto al copiare i file da un progetto
+all'altro e modificare dove necessario. Ora è possibile avviare l'export tramite
+lo stesso flag di Matitac presente in Krajono.
+
+
+
+% 1. Come invocare krajono per produrre i file dk
+% 2. Integrare Krajono: come krajono è stato strutturato e come l'ho integrato
+% 3. Come funziona l'export di Krajono?
+% 4. Drawbacks dell'exporting
+
+
+\chapter{Da Dedukti a Matita}
+Come visto nel capitolo precedente, usando Krajono è possibile esportare 
 del codice Matita verso Dedukti, tuttavia non è possibile fare il contrario,
 in quanto ne Krajono, ne Dedukti stesso godono di questa funzionalità.
 L'export è dunque a senso unico, e qualcosa di esportato non può essere
-re\-importato in Matita. Il lavoro di questa tesi è proprio il seguente:
+re-importato in Matita. Il lavoro di questa tesi è proprio il seguente:
 rendere Matita capace di esportare ed importare codice da e verso Dedukti.
 Con un export a doppio senso gli sviluppatori Matita saranno in grado 
 di usare dimostrazioni Dedukti e vice versa.
-
-
-\chapter{Parte tecnica} % TODO
-\section{Export: da Matita a Dedukti}
-
 
 
 
