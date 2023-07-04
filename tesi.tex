@@ -162,16 +162,32 @@ abilità di eliminare gli errori e le ambiguità che possono comparire nelle
 dimostrazioni tradizionali.
 
 \subsection{Matita}
-Matita è un  proof assistant sotto sviluppo nel dipartimento di informatica all'
-Università di Bologna. E' basato sul \textit{calcolo delle costruzioni coinduttive}.
-Il software, che è open source, è scritto nel linguaggio di programmazione OCAML 
-ed è rilasciato secondo i termini della GNU General Public Licence.
+Matita è un  proof assistant in sviluppo nel dipartimento di informatica dell'
+Università di Bologna. E' open source, scritto nel linguaggio di programmazione 
+OCaml ed è rilasciato secondo i termini della GNU General Public Licence.
+E' basato sul \textit{calcolo delle costruzioni (co)induttive}, una teoria di tipi
+dipendenti che estende il \textit{calcolo delle costruzioni} sviluppato da
+Thierry Coquand aggiungendo i tipi induttivi, ovvero tipi autoreferenzianti.
+
 
 \subsection{Dedukti}
-Dedukti (che significa "dedurre" in esperanto) è un \textit{logical framework}
-sviluppato da alcuni ricercatori del INRIA, basato sul \textit{calcolo lambda-pi}.
-Il software è open source, anch'esso scritto nel linguaggio di programmazione OCAML
-e distribuito secondo i termini della CeCILL-B License.
+Dedukti\footnote{"dedurre" in esperanto} è un \textit{logical framework}
+sviluppato da alcuni ricercatori del \textit{Institut national de recherche
+en informatique et en automatique} francese. Il software è open source, anch'esso
+scritto nel linguaggio di programmazione OCaml e distribuito secondo i termini
+della CeCILL-B License. Uno degli obbiettivi principali di Dedukti è creare una
+connessione tra i diversi sistemi di dimostrazione assistita al computer. Ciò
+significa che le dimostrazioni possono essere tradotte da un sistema all'altro,
+agevolando lo scambio e il riutilizzo delle dimostrazioni tra ambienti di lavoro
+diversi. Alcuni proof system, come ad esempio Coq e Hol Lite 
+\footnote{Coq: https://github.com/Deducteam/CoqInE,\\ HOL Lite: https://arxiv.org/pdf/1507.08720.pdf}
+godono infatti della possibilità di esportare e importare codice da e verso Dedukti.
+
+Si basa sul $\lambda\pi$-calcolo, un'estensione del 
+$\lambda$-calcolo che introduce la tipizzazione dipendente, consentendo la
+specifica di tipi complessi che dipendono dai valori delle espressioni. Questa
+caratteristica lo rende un potente strumento per la verifica formale e la
+dimostrazione assistita tramite proof assistant.
 
 \section{Interoperabilità Dedukti-Matita}
 
@@ -193,9 +209,10 @@ A tale scopo, nel tempo sono state aggiunte ad alcuni di tool delle funzionalit�
 di export, per permettere all'utente di ottenere la propria dimostrazione in un
 formato compatibile con un altro software.
 
-\chapter{Da Matita a Dedukti}
+\chapter{Da Matita a Dedukti} \label{capitoloExport}
 \section{Krajono}
-Attorno al 2018 un team di sviluppatori del \textit{Institut national de recherche
+Attorno al 2018 un team di sviluppatori del 
+\textit{Institut national de recherche
 en informatique et en automatique} %TODO check 
 ha sviluppato un fork di Matita con la possibilità di esportare le dimostrazioni
 in un formato compatibile con Dedukti. Questo fork è tutt'ora distribuito 
@@ -204,38 +221,42 @@ non è stato aggiornato con gli ultimi sviluppi del Matita baseline.
 Il primo passo del mio lavoro è stato quello di integrare il codice di Krajono
 dentro a Matita.
 
-\subsection{Krajono: funzionamento dell'esportazione}
+\subsection{Funzionamento dell'esportazione}
 Il processo di esportazione prevede l'analisi del tipo e della struttura di 
 ciascuna istruzione del file Matita. Queste passano per un processo di 
-\textit{scanning} e \textit{parsing}, fino a diventare oggetti contenti i
+\textit{scanning} e \textit{parsing}, fino a diventare oggetti contenenti i
 termini, in un albero astratto. Questi vegono poi passati singolarmente al
 modulo responsabile per la conversione. Durante questo processo vengono
 analizzate la struttura e le caratteristiche di ciascun termine, per poi
-costruirne uno rappresentante una istruzione Dedukti il più possibile
-equivalente. La traduzione cerca quindi di essere una trasformazione uno a uno,
-dove è possibile.
+costruirne uno o più rappresentanti istruzioni Dedukti. La traduzione cerca 
+di essere dove possibile una trasformazione uno a uno, anche se come si vedrà
+nella sezione \ref{ProblemiKrajono} non sempre è possibile.
 
-\subsection{Krajono: export da linea di comando}
+\subsection{Export da linea di comando}
 Matitac è il compilatore da linea di comando di Matita. Se lo si lancia compila
 tutti i file con estensione \textit{.ma} presenti nella directory corrente. 
 Opzionalmente, passando come argomento il nome di un file, è possibile anche 
 compilarlo singolarmente. 
 
-Krajono fornisce la possibilità di esportare il codice Matita passando il flag
-\texttt{-extract\_dedukti} a Matitac, sia lavorando con un unico file, sia con
-un'intera directory. Successivamente uno potrà trovare i file \textit{.dk} 
+Krajono fornisce la possibilità di esportare il codice Matita specificando l'
+argomento \texttt{-extract\_dedukti} a Matitac, sia lavorando con un unico file,
+sia con un'intera directory. Successivamente si potranno trovare i file \textit{.dk} 
 relativi al codice matita esportato nella directory dei sorgenti.
 
-\subsection{Krajono: integrazione in Matita}
-Per fare il porting della funzionalità, invece di aprire una \textit{pull
-request} da una repository Git all'altra, si è preferito copiare e addattare i
-singoli file sorgente responsabili dell'esportazione.
+\subsection{Integrazione in Matita}
+Per integrare le funzionalità di Krajono in Matita al posto di aprire una \textit{
+pull request} da una repository Git all'altra, si è preferito copiare e addattare i
+singoli file sorgente responsabili dell'esportazione. Questo in quanto utilizzare
+lo strumento di versionamento automatico avrebbe portato delle complicazioni in
+quanto Krajono non è basato direttamente sul Matita baseline, ma su un ulteriore
+fork \footnote{https://github.com/LPCIC/matita}. Inoltre Krajono, al momento della
+stesura di questa tesi, non è più mantenuto da anni. 
 
 \paragraph{Struttura del sorgente}
-Il codice per implemetare la funzionalità in Krajono è diviso in tre moduli OCaml:
+In codice sorgente responsabile dell'esportazione è diviso in tre moduli OCaml:
 \begin{itemize}
   \item \textit{dedukti}: contenente le definizioni di costanti e funzioni
-    di utilità, invocate dal codice dell'export.
+    di utilità.
   \item \textit{deduktiExtraction}: contenente la logica del vero e proprio 
     export.
   \item \textit{deduktiPrint}: contenente semplici funzioni per stampare a 
@@ -244,15 +265,18 @@ Il codice per implemetare la funzionalità in Krajono è diviso in tre moduli OC
 
 Durante la compilazione di un file, quando il flag \texttt{-extract\_dedukti} è
 attivo, il motore di Matita/Krajono avvia l'esportazione chiamando una funzione
-dal modulo deduktiExtraction durante la fase di costruzione dell'albero astratto.
+dal modulo \texttt{deduktiExtraction} durante la fase di costruzione dell'albero
+astratto.
 
-\paragraph{Integrazione in Matita}
+\paragraph{Integrazione}
 Il codice interessato dunque è poco dipendente dal resto del codice di Matita,
 quindi il porting della funzionalità si è ridotto al copiare i file da un progetto
 all'altro e modificare dove necessario. Ora è possibile avviare l'export tramite
 lo stesso flag di Matitac presente in Krajono.
 
 
+\section{Problemi di Krajono} \label{ProblemiKrajono}
+Essendo il linguaggio di Dedukti meno espressivo del 
 
 % 1. Come invocare krajono per produrre i file dk
 % 2. Integrare Krajono: come krajono è stato strutturato e come l'ho integrato
@@ -270,6 +294,87 @@ rendere Matita capace di esportare ed importare codice da e verso Dedukti.
 Con un export a doppio senso gli sviluppatori Matita saranno in grado 
 di usare dimostrazioni Dedukti e vice versa.
 
+\section{Il parser Dedukti} \label{parserDedukti}
+% TODO
+% spiegare che dedukti è diventato dipendenza
+
+\section{Tradurre i termini Dedukti}
+Alcuni termini Dedukti sono direttamente traducibili in termini Matita. Alcuni
+invece richiedono una logica più complessa.
+
+\paragraph{Costanti}
+Per tradurre le costanti è stato necessario semplicemente convertire il nome
+Dedukti in un \textit{uri} Matita. Per evitare conflitti con i nomi si è aggiunto
+anche una tabella hash che per tenere traccia dei nomi già assegnati e dei 
+relativi uri.
+
+\paragraph{Indici di De Brujin}
+Entrambi i software fanno uso degli indici di De Brujin, una rappresentazione
+compatta delle variabili legateall'interno di un termine. Sono utilizzati per
+semplificare la manipolazione dei termini, eliminando la necessità di utilizzare
+nomi unici per le variabili e consentendo di eseguire operazioni come la 
+sostituzione e il confronto tra termini in modo efficente. 
+Essendo un indice rappresentato da un intero la conversione è stata diretta.
+L'unica accortezza presa è stata l'aggiungere $1$ ad ogni indice in quanto
+Matita fa uso di un sistema \textit{$1$ based} mentre Dedukti conta partendo
+da $0$.
+
+\paragraph{$\beta$-riduzione}
+In Dedukti il passo di $\beta$-riduzione è rappresentato tramite una tripla
+contenente: 
+\begin{itemize}
+  \item Un termine rappresentante la $\lambda$ astrazione da ridurre
+  \item Un termine rappresentante il primo argomento da usare per la riduzione
+  \item Una lista di termini rappresentante il resto degli argomenti
+\end{itemize}
+Per tradurlo è stato sufficente tradurre individualmente, ricorsivamente, ciasucno
+di questi termini, e riassemblarli costruiendo un oggetto che rappresenta la 
+$\beta$-riduzione in Matita. 
+L'esportazione del capitolo \ref{capitoloExport} utilizza delle particolari
+definizioni per rappresentare alcuni termini di Matita %TODO all the cic.stuff
+
+\paragraph{$\lambda$-astrazione e prodotto}
+Astrazioni lambda e prodotti condividono la stessa struttura e per tanto sono
+rappresentati allo stesso modo sia in Dedukti che in Matita.
+Nel primo sono rappresentati come una tupla contenente
+\begin{itemize}
+  \item Un identificativo Dedukti
+  \item Un termine rappresentante il tipo della $\lambda$-astrazione o del prodotto
+  \item Un termine rappresentante il corpo
+\end{itemize}
+Si costruiscono quindi i relativi oggetti Matita convertendo l'identificativo
+e traducendo ricorsivamente il tipo e il corpo.
+
+\paragraph{Type e Kind}
+Il calcolo lambda-pi usa i concetti di \textit{type} e \textit{kind}: type è
+il classico \textit{concetto di tipo} usato per la classificazione di termini,
+mentre kind è un tipo speciale rappresentante il tipo di tutti i tipi. Ad 
+esempio 5 può avere tipo $nat$, mentre $nat$ porebbe avere kind $*$. Nel 
+calcolo delle costruzioni (co)induttive alla base di Matita questi concetti
+non sono presenti, e per tanto non sono stati tradotti. %TODO add info about sort and univs
+
+\section{Invertire l'esportazione}
+Fino adesso è stato visto come importare in Matita del codice Dedukti semplice,
+tuttavia, se si volesse importare del codice precedentemente esportato usando
+la funzionalità del capitolo \ref{capitoloExport}, ci si accorgerebbe della 
+scomparsa di alcuni costrutti Matita, come ad esempio il \textit{match}. Questo
+perché, dato che Dedukti non li possiede, durante l'esportazione sono stati
+trasformati in termini che ne emulano il comportamento. Per rendere dunque possibile
+la costruzione di un codice quanto più vicino all'originale si ha pensato ed 
+implementato la strategia qua successivamente discussa.
+
+\subsection{L'uso delle pragma}
+Il linguaggio di Dedukti da la possibilità all'utente di scrivere delle 
+\textit{direttive} o \textit{pragma}. Queste sono delle particolari righe di
+codice interpretate dal compilatore e che per tanto non fanno parte del programma.
+Usandole è possibile istruire il compilatore Dedukti, o nel nostro caso il parser
+Dedukti integrato dentro Matita \ref{parserDedukti}, affinché agisca in determinati
+modi quando le incontra. 
+Nel caso specifico di questa tesi, sono state definite ed usate delle pragma
+per indicare quali parti di codice Dedukti fanno riferimento ad un costrutto 
+Matita andato perso durante l'esportazione.
+
+\subsection{Punto fisso}
 
 
 \chapter{Conclusioni}
@@ -278,6 +383,6 @@ di usare dimostrazioni Dedukti e vice versa.
 
 
 
-
-
+% bio
+% http://www.cs.unibo.it/~ricciott/PAPERS/system_description2011_draft.pdf
 \end{document}
