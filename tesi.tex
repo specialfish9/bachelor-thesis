@@ -371,16 +371,80 @@ Usandole è possibile istruire il compilatore Dedukti, o nel nostro caso il pars
 Dedukti integrato dentro Matita \ref{parserDedukti}, affinché agisca in determinati
 modi quando le incontra. 
 Nel caso specifico di questa tesi, sono state definite ed usate delle pragma
-per indicare quali parti di codice Dedukti fanno riferimento ad un costrutto 
+per indicare quali parti di codice Dedukti che fanno riferimento ad un costrutto 
 Matita andato perso durante l'esportazione.
 
-\subsection{Punto fisso}
+\paragraph{Sinstassi} Le pragma sono sostanzialmente delle stringhe, quindi
+è stato necessario pensare ad uno standard che aiutasse a strutturarle e 
+ne faclitasse il parsing. Dato che la traduzione di un costrutto Matita in 
+Dedukti può risultare in un blocco di istruzioni bisogna essere in grado di
+capire dove questo inizia e finisce. Inoltre, per poter ricostruire un oggetto
+talvolta è necessario salvare degli attributi aggiuntivi, specificando anche
+a quale oggetto fanno riferimento. Per tanto si è pensato di inserire pragma
+con la seguente sintassi:
 
+\begin{center}
+  \texttt{\#PRAGMA [BEGIN|END] <NOME> [ATTR[:rif]=val]... .}
+\end{center}
+Le seguenti pragma ad esempio sono valide
+\begin{itemize}
+  \item  \texttt{\#PRAGMA FOO BAR=42.} L'istruzione successiva è di tipo
+\texttt{FOO} e ha l'attributo \texttt{BAR} che vale \texttt{42}.
+  \item  \texttt{\#PRAGMA BEGIN BLOCK GREETINGS:world=hello.} Inizia un blocco di
+    tipo \texttt{BLOCK} con l'attributo \texttt{GREETINGS} di valore \texttt{hello}
+    che fa riferimento a \texttt{world}.
+  \item  \texttt{\#PRAGMA END BLOCK.} Fine di un blocco di tipo \texttt{BLOCK}
+\end{itemize}
+
+\subsection{Punto fisso}
+Dato un insieme $A$ e una funzione $f: A \rightarrow A$, $x \in A$ si dice
+\textit{punto fisso di f} se e solo se $x = f(x)$. Nella teoria dei tipi 
+questo concetto è utile per rappresentare le funzioni ricorsive.
+Questo è uno di quei costrutti che viene perso durante l'esportazione, in 
+quanto Matita ne fa uso mentre Dedukti no.
+
+\paragraph{Punto fisso nell'encoding} Un'istruzione di tipo punto fisso è tradotta
+come un insieme di astrazioni lambda e delle regole di riscrittura. In particolare
+per ciascun punto fisso si ottengono un'astrazione e una regola per rappresentare
+il tipo e un'astrazione e una regola per rappresentare il corpo.
+
+\paragraph{La pragma} Per poter ricostruire l'oggetto Matita iniziale, oltre
+ad individuare tipo e corpo, è necessario anche conoscere un parametro chiamato
+\textit{recno}. Questo è un indice (\textit{0-based}) che serve ad individuare
+su quale argomento della funzione avviene la ricorsione. Il valore però viene
+anch'esso perso durante l'esportazione, quindi è stato necessario trovare un
+modo per preservarlo. Per conservare queste informazioni si è modificato il
+codice dell'esportazione in modo da inserire delle pragma come delimitatori
+del blocco di istruzioni Dedukti rappresentanti l'encoding del fixpoint.
+In particolare la pragma per indiciare l'inizio del blocco è nella forma:
+\begin{center}
+\texttt{\#PRAGMA BEGIN FIXPOINT NAME=name RECNO:name=0}
+\end{center}
+Mentre la pragma di chisura è nella forma:
+\begin{center}
+\texttt{\#PRAGMA END FIXPOINT}
+\end{center}
+
+L'attributo \texttt{NAME} rappresenta il nome della funzione, e ce ne possono
+essere più di uno nel caso in cui si abbia della ricorsione mutua. Il \textit{recno}
+viene esplicitato nell'omonimo attributo, specificando anche a quale nome fa
+riferimento. Nel caso di ricorsione mutua si potrebbe ottenere una pragma nella
+forma:
+\begin{center}
+\texttt{\#PRAGMA BEGIN FIXPOINT NAME=f NAME=g RECNO:f=0 RECNO:g=1}
+\end{center}
+
+\paragraph{Il corpo}
+
+\subsection{Tipi induttivi}
+
+\subsection{pattern matching}
+
+\subsection{Pragma generated}
 
 \chapter{Conclusioni}
 
 \chapter{Sviluppi futuri}
-
 
 
 % bio
