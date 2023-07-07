@@ -72,7 +72,7 @@ uniforme di calcoli. Grazie ad esso è possibile sviluppare un sistema di codifi
 converta dimostrazioni scritte nel linguaggio di altri proof assistant, come \textit{Coq} e \textit{HOL lite},
 nel metalinguaggio di Dedukti. Proprio per questo all'INRIA è stato sviluppato \textit{Krajono}, un
 fork di \textit{Matita}, un proof assistant in sviluppo nel Dipartimento 
-di Informatica dell'Università di Bologna. Krajono permette di esportare e definizioni
+di Informatica dell'Università di Bologna. Krajono permette di esportare le definizioni
 e i teoremi dati in Matita verso Dedukti, attraverso una codifica del calcolo
 di Matita in quello di Dedukti. Krajono tuttavia non è più mantenuto e pertanto non integra
 le funzionalità del Matita baseline sviluppate negli ultimi anni. 
@@ -359,82 +359,68 @@ let rec len l on l =
  ].
 \end{lstlisting}
 
-\section{Interoperabilità Dedukti-Matita}
-
+Krajono permette di esportare e definizioni
+e i teoremi dati in Matita verso Dedukti, attraverso una codifica del calcolo
+di Matita in quello di Dedukti. Krajono tuttavia non è più mantenuto e pertanto non integra
+le funzionalità del Matita baseline sviluppate negli ultimi anni.
 
 \chapter{Da Matita a Dedukti} \label{capitoloExport}
+In questo capitolo viene prima introdotto \textit{Krajono}, il fork di Matita
+da cui proviene il codice responsabile dell'export da Matita verso Dedukti. 
+Successivamente viene analizzato nel dettaglio tecnico e teorico, il funzionamento 
+di questa esportazione. Infine ne vengono discusse problematiche e limitazioni.
+
 \section{Krajono}
-Attorno al 2018 un team di sviluppatori del 
-\textit{Institut national de recherche
-en informatique et en automatique} %TODO check 
-ha sviluppato un fork di Matita con la possibilità di esportare le dimostrazioni
-in un formato compatibile con Dedukti. Questo fork è tutt'ora distribuito 
-pubblicamente con il nome di \textit{Krajono} ("matita" in esperanto) anche se 
-non è stato aggiornato con gli ultimi sviluppi del Matita baseline.
-Il primo passo del mio lavoro è stato quello di integrare il codice di Krajono
-dentro a Matita.
-
-\subsection{Funzionamento dell'esportazione}
-Il processo di esportazione prevede l'analisi del tipo e della struttura di 
-ciascuna istruzione del file Matita. Queste passano per un processo di 
-\textit{scanning} e \textit{parsing}, fino a diventare oggetti contenenti i
-termini, in un albero astratto. Questi vengono poi passati singolarmente al
-modulo responsabile per la conversione. Durante questo processo vengono
-analizzate la struttura e le caratteristiche di ciascun termine, per poi
-costruirne uno o più rappresentanti istruzioni Dedukti. La traduzione cerca 
-di essere dove possibile una trasformazione uno a uno, anche se come si vedrà
-nella sezione \ref{ProblemiKrajono} non sempre è possibile.
-
-\subsection{Export da linea di comando}
-Matitac è il compilatore da linea di comando di Matita. Se lo si lancia compila
-tutti i file con estensione \textit{.ma} presenti nella directory corrente. 
-Opzionalmente, passando come argomento il nome di un file, è possibile anche 
-compilarlo singolarmente. 
-
-Krajono fornisce la possibilità di esportare il codice Matita specificando l'
-argomento \texttt{-extract\_dedukti} a Matitac, sia lavorando con un unico file,
-sia con un'intera directory. Successivamente si potranno trovare i file \textit{.dk} 
-relativi al codice matita esportato nella directory dei sorgenti.
+Un team di ricercatori del \textit{Institut national de recherche en informatique 
+et en automatique} ha sviluppato Krajono \footnote{Significa "Matita" in Esperanto}
+\footnote{https://github.com/Deducteam/Krajono}. Krajono ha la possibilità
+di esportare definizioni e teoremi dati in Matita verso Dedukti. Per far ciò
+sfrutta una codifica del calcolo di Matita nel metalinguaggio di Dedukti. 
+Tuttavia attualmente questo fork non è più mantenuto da anni. Il primo passo
+del mio lavoro è quello di integrare la funzionalità di export di Krajono
+nel Matita baseline.
 
 \subsection{Integrazione in Matita}
-Per integrare le funzionalità di Krajono in Matita al posto di aprire una \textit{
+Per integrare le funzionalità di Krajono in Matita invece di aprire una \textit{
 pull request} da una repository Git all'altra, si è preferito copiare e adattare i
 singoli file sorgente responsabili dell'esportazione. Questo in quanto utilizzare
 lo strumento di versionamento automatico avrebbe portato delle complicazioni in
 quanto Krajono non è basato direttamente sul Matita baseline, ma su un ulteriore
-fork \footnote{https://github.com/LPCIC/matita}. Inoltre Krajono, al momento della
-stesura di questa tesi, non è più mantenuto da anni. 
+fork, chiamato \textit{Matita with embedded Elpi}\footnote{https://github.com/LPCIC/matita}. 
 
-\paragraph{Struttura del sorgente}
-In codice sorgente responsabile dell'esportazione è diviso in tre moduli OCaml:
-\begin{itemize}
-  \item \textit{dedukti}: contenente le definizioni di costanti e funzioni
-    di utilità.
-  \item \textit{deduktiExtraction}: contenente la logica del vero e proprio 
-    export.
-  \item \textit{deduktiPrint}: contenente semplici funzioni per stampare a 
-    schermo gli oggetti usati nell'export.
-\end{itemize}
+In codice sorgente responsabile dell'esportazione è diviso in pochi moduli OCaml
+quasi del tutto indipendenti dal restante codice sorgente di Matita, per tanto
+integrarli nel Matita moderno non causa problemi.
 
-Durante la compilazione di un file, quando il flag \texttt{-extract\_dedukti} è
-attivo, il motore di Matita/Krajono avvia l'esportazione chiamando una funzione
-dal modulo \texttt{deduktiExtraction} durante la fase di costruzione dell'albero
-astratto.
+\section{L'export}
+\subsection{Il processo di esportazione}
+\textit{Matitac} è il compilatore da linea di comando di Matita. Se lo si lancia
+compila tutti i file con estensione \textit{.ma} presenti nella directory corrente. 
+Opzionalmente, passando come argomento il nome di un file, è possibile anche 
+compilare solo quello singolarmente. Krajono fornisce la possibilità di attivare
+la funzionalità di export specificando l'argomento \texttt{-extract\_dedukti} a Matitac,
+sia lavorando con un unico file sia con un'intera directory. A processo concluso 
+si potranno trovare, nella directory dei sorgenti, i file \textit{.dk} contenente
+il codice matita esportato.
 
-\paragraph{Integrazione}
-Il codice interessato dunque è poco dipendente dal resto del codice di Matita,
-quindi il porting della funzionalità si è ridotto al copiare i file da un progetto
-all'altro e modificare dove necessario. Ora è possibile avviare l'export tramite
-lo stesso flag di Matitac presente in Krajono.
 
+%PRESENTE----------------------------------------------------------------------------------------------------------
+Quando il suddetto flag è attivo il motore di Matita avvia l'esportazione chiamando
+una funzione di uno dei moduli OCaml importati da Krajono. Questi moduli compiono
+delle analisi del tipo e della struttura del termine Matita con lo scopo di
+capire come applicare l'encoding appropriato. Una volta costruiti, i termini
+Dedukti risultanti dalla codifica vengono inseriti in una tabella hash
+che alla fine del processo verrà scritta sul file \textit{.dk} di output.
+
+È importante notare come il processo di esporazione non è sempre un encoding
+\textit{uno a uno}, ma determinati tipologie di termini Matita vengono codificati
+in più termini Dedukti.
+
+\subsection{L'encoding}
+%TODO IDk what to write
 
 \section{Problemi di Krajono} \label{ProblemiKrajono}
-Essendo il linguaggio di Dedukti meno espressivo del 
 
-% 1. Come invocare krajono per produrre i file dk
-% 2. Integrare Krajono: come krajono è stato strutturato e come l'ho integrato
-% 3. Come funziona l'export di Krajono?
-% 4. Drawbacks dell'exporting
 
 
 \chapter{Da Dedukti a Matita}
@@ -454,6 +440,10 @@ di usare dimostrazioni Dedukti e vice versa.
 \section{Tradurre i termini Dedukti}
 Alcuni termini Dedukti sono direttamente traducibili in termini Matita. Alcuni
 invece richiedono una logica più complessa.
+
+\subsection{La gestione dei nomi}
+
+\subsection{il resto bla bla}
 
 \paragraph{Costanti}
 Per tradurre le costanti è stato necessario semplicemente convertire il nome
@@ -595,10 +585,7 @@ forma:
 
 \subsection{Pragma generated}
 
-\chapter{Conclusioni}
-
-\chapter{Sviluppi futuri}
-
+\chapter{Conclusioni \& sviluppi futuri}
 
 % bio
 % http://www.cs.unibo.it/~ricciott/PAPERS/system_description2011_draft.pdf
