@@ -6,14 +6,20 @@
 \usepackage{amsfonts}
 \usepackage{graphicx}
 \usepackage{listings}
+\usepackage{fancyhdr}
 \usepackage{styles/bussproofs}
 \graphicspath{ {./pic/} }
 
 \lstset{language=Caml}
+\lstset{mathescape=true}
 \lstset{morekeywords={include,inductive} }
 \lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
 
 \begin{document}
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+\fancyhead[R]{}
+\fancyhead[L]{\chaptername\ \thechapter\ --\ \leftmark}
 
 \begin{titlepage}
   \begin{center}
@@ -54,56 +60,58 @@
 \begin{abstract}
 \end{abstract}
 
+\thispagestyle{empty}
 \tableofcontents
 
-\chapter*{Introduzione}
+\chapter{Introduzione}
 I \textit{proof assistant} sono software in grado di verificare una dimostrazione
 formale scritta da un utente. Questa viene rappresentata internamente attraverso 
 termini di un linguaggio funzionale dotato di un sistema di tipi avanzato, tale
-da renderlo equivalente a una logica. Il loro sviluppo negli anni ha portato a una frammentazione
-in quanto sistemi diversi, che usano logiche diverse, non sono compatibili tra 
-loro. Per ovviare a questo problema un gruppo di ricercatori del INRIA ha creato
-\textit{Dedukti}, la cui idea è quella di agire da \textit{type checker} per definizioni, enunciati e prove codificati
-nel calcolo da lui implementato. Tale calcolo è sufficientemente espressivo 
-per rappresentare in Dedukti qualunque sistema di tipi, ovvero qualunque linguaggio
-funzionale con un sistema di tipi avanzato. Questo rende Dedukti un \textit{logical 
-framework}, ovvero un calcolo che svolge il ruolo di meta-calcolo per la rappresentazione
-uniforme di calcoli. Grazie a esso è possibile sviluppare un sistema di codifica che
-converta dimostrazioni scritte nel linguaggio di altri proof assistant, come \textit{Coq} e \textit{HOL lite},
-nel metalinguaggio di Dedukti. Proprio per questo all'INRIA è stato sviluppato \textit{Krajono}, un
-fork di \textit{Matita}, un proof assistant in sviluppo nel Dipartimento 
-di Informatica dell'Università di Bologna. Krajono permette di esportare le definizioni
-e i teoremi dati in Matita verso Dedukti, attraverso una codifica del calcolo
-di Matita in quello di Dedukti. Krajono tuttavia non è più mantenuto e pertanto non integra
-le funzionalità del Matita baseline sviluppate negli ultimi anni. 
-Il lavoro di questa tesi è diviso in due parti: la prima prevede l'integrazione della 
-funzionalità di esportazione di Krajono nel Matita odierno, mentre l'obiettivo della seconda
-consiste nel implementare la possibilità di reimportare
+da renderlo equivalente a una logica. Il loro sviluppo, negli anni, ha portato a una 
+frammentazione della conoscenza in quanto sistemi diversi, che usano logiche diverse,
+non sono compatibili tra loro. Per ovviare a questo problema un gruppo di ricercatori
+dell'INRIA ha creato \textit{Dedukti}, la cui idea è quella di agire da \textit{type
+checker} per definizioni, enunciati e prove codificati nel calcolo che implementa. 
+Tale calcolo è sufficientemente espressivo per rappresentare in Dedukti qualunque
+sistema di tipi, ovvero qualunque linguaggio funzionale con un sistema di tipi avanzato.
+Questo rende Dedukti un \textit{logical framework}, ovvero un calcolo che svolge il 
+ruolo di meta-calcolo per la rappresentazione uniforme di altri calcoli. Grazie a
+esso è possibile sviluppare un sistema di codifica che converta dimostrazioni scritte
+nel linguaggio di altri proof assistant, come \textit{Coq} e \textit{HOL lite}, nel
+metalinguaggio di Dedukti. Proprio per questo all'INRIA è stato sviluppato \textit{Krajono},
+un \textit{fork} di \textit{Matita}, che a sua volta è un proof assistant in sviluppo
+nel Dipartimento di Informatica Scienze e Ingegneria dell'Università di Bologna.
+Krajono permette di esportare le definizioni e i teoremi dati in Matita verso Dedukti,
+attraverso una codifica del calcolo di Matita in quello di Dedukti. Krajono tuttavia 
+non è più mantenuto e pertanto non integra le funzionalità del Matita \textit{baseline}
+sviluppate negli ultimi anni. Il lavoro di questa tesi è diviso in due parti: la prima
+prevede l'integrazione della funzionalità di esportazione di Krajono nel Matita odierno,
+mentre l'obiettivo della seconda consiste nell'implementare la possibilità di reimportare
 codice Dedukti esportato precedentemente da Matita. Il secondo punto in particolare 
 ha richiesto la risoluzione di una serie di problemi, in primis dovuti al fatto che
-il linguaggio di Matita è più rigido e strutturato del metalinguaggio di Dedukti,
-pertanto durante l'esportazione venivano perse informazioni necessarie alla
+il linguaggio di Matita sia più rigido e strutturato del metalinguaggio di Dedukti,
+pertanto durante l'esportazione vengono perse informazioni necessarie alla
 ricostruzione del codice originale. Ciò è stato risolto dotando l'export di
 un meccanismo per preservarle dove necessario. In secondo luogo i sistemi di tipi
 codificati in Dedukti, per essere consistenti, richiedono che le regole di riscrittura
-scelte dagli sviluppatori per implementare l'encoding siano confluenti e normalizzanti.
-Dedukti non effettua questa verifica, che demanda ad altri tool. Matita, invece, impone
+scelte dagli sviluppatori per implementare la codifica siano confluenti e normalizzanti.
+Dedukti non effettua questa verifica, che demanda ad altri strumenti. Matita, invece, impone
 un insieme molto restrittivo di controlli sintattici per garantire confluenza e terminazione,
 che sono in generale proprietà indecidibili. Pertanto, quando si inverte il processo di
 esportazione, sorge la necessità di ricostruire termini che soddisfino le condizioni 
 sintattiche di Matita, che sono sufficienti, ma non necessarie, e che potrebbero essere
-state violate durante l'encoding in Dedukti, nonostante le regole fossero anche confluenti
+state violate durante la codifica in Dedukti, nonostante le regole fossero anche confluenti
 e normalizzanti.
 
 \chapter{Basi teoriche}
 In questo capitolo vengono trattate le conoscenze teoriche necessarie per la
-comprensione del lavoro esposto nei capitoli successivi. Nella sezione \ref{teoriaDeiTipi}
+comprensione del lavoro esposto in quelli successivi. Nella sezione \ref{teoriaDeiTipi}
 sono illustrati i fondamenti della \textit{Teoria dei Tipi}, teoria alla base 
 di questa tesi. Nella sezione \ref{proofAssistant} vengono trattati i \textit{proof 
 assistant} e il problema della loro interoperabilità.
 
-\section{La Teoria dei Tipi} \label{teoriaDeiTipi}
-\subsection{La Teoria dei Tipi}
+\section{La teoria dei tipi} \label{teoriaDeiTipi}
+\subsection{La teoria dei tipi}
 La \textit{teoria dei tipi} è una branca della logica e dell'informatica teorica il
 cui obbiettivo è quello di studiare i così detti \textit{type system}, ovvero
 insiemi di regole che associano una proprietà chiamata \textit{tipo} a degli oggetti
@@ -117,9 +125,9 @@ Esempi comuni possono essere:
 \end{itemize}
 
 Formalmente si usa rappresentare queste espressioni separando il termine dal tipo usando
-il simbolo '$:$'. 
+il simbolo ``$:$''. 
 
-Nella teoria dei tipi, anche le funzioni sono termini e possono essere
+In teoria dei tipi, anche le funzioni sono termini e possono essere
 a loro volta tipizzate. Ad esempio, la seguente funzione rappresentata attraverso un $\lambda$-termine
 del $\lambda$-calcolo di Church 
 \begin{center}
@@ -164,43 +172,44 @@ può essere riassunto con la seguente tabella:
 \subsection{La teoria dei tipi nella pratica}
 La teoria dei tipi trova quindi grande applicazione nel campo dell'informatica
 grazie allo studio e allo sviluppo dei linguaggi di programmazione. Inoltre,
-grazie all'isomorfismo di Curry-Howard, ha permesso lo sviluppo di dimostratori
-interattivi di teoremi, i quali sono soggetto di questa tesi.
+ha permesso lo sviluppo di dimostratori interattivi di teoremi grazie all'
+isomorfismo di Curry-Howard.
 
 \section{Dedukti e Matita}\label{proofAssistant}
-\subsection{Dimostratori Interattivi di Teoremi} 
+\subsection{Dimostratori interattivi di teoremi} 
 Un dimostratore interattivo di teoremi (o \textit{proof assistant}) è un software 
 che permette all'utente di costruire e verificare delle dimostrazioni matematiche
 formali. Presa in input una prova espressa utilizzando uno specifico linguaggio 
 formale il software è in grado di
 verificarne la correttezza. In questo modo si possono costruire dimostrazioni
 in modo interattivo, controllando progressivamente la correttezza di ogni passo.
-Uno dei benefici chiave dell'usare un dimostratore interattivo automatico è l'
-abilità di eliminare gli errori e le ambiguità che possono comparire nelle 
-dimostrazioni tradizionali. Durante la fase di verifica il proof assistant
-rappresenta i termini della dimostrazione attraverso un linguaggio di programmazione
-dotato di un sistema di tipi avanzato, ottenendo alla fine l'equivalente di un
-programma. Successivamente esegue un processo di \textit{type checking} in cui
-verifica la correttezza degli assegnamenti di tipo del programma. Grazie all'isomorfismo
-di Curry-Howard questo equivale a verificare la correttezza della prova.
+Uno dei benefici chiave dell'usare un dimostratore interattivo automatico è l'abilità
+di eliminare gli errori e le ambiguità che possono comparire nelle 
+dimostrazioni tradizionali. Durante la fase di verifica, il proof assistant rappresenta 
+i termini della dimostrazione utilizzando un linguaggio di programmazione dotato di
+un sistema di tipi avanzato, ottenendo alla fine una rappresentazione che può essere
+considerata equivalente a un programma. Successivamente esegue un processo di \textit{
+  type checking} in cui verifica la correttezza degli assegnamenti di tipo del programma.
+Grazie all'isomorfismo di Curry-Howard questo, equivale a verificare la correttezza della 
+prova.
 
-Il numero di proof assistant è aumentato nel tempo. Ciò porta sicuramente un
-beneficio alla comunità scientifica, in quanto dimostra un crescente interesse
-verso lo sviluppo di questi strumenti. Tuttavia questo aumento, unito al fatto
-che proof assistant diversi sfruttano logiche diverse, porta a una \textit{
-frammentazione}. Per un utente non è quasi mai possibile infatti dimostrare la
+Il numero di proof assistant è aumentato nel tempo. Ciò è sicuramente un segnale
+positivo per la comunità scientifica, in quanto dimostra un crescente interesse
+verso lo sviluppo di questi strumenti. Tuttavia, questo aumento, unito al fatto
+che proof assistant diversi sfruttano logiche diverse, porta a una frammentazione
+della conoscenza. Per un utente non è quasi mai possibile, infatti, dimostrare la
 veridicità di un teorema usando un proof assistant e usare la stessa dimostrazione
 in un altro di questi tool senza doverla riscrivere.
-Questo perché diversi proof assistant usano diversi sistemi di tipi e una dimostrazione
-per poter essere verificata con sistema di tipi diverso deve essere tradotta.
+Questo perché diversi proof assistant usano diversi sistemi di tipi e una dimostrazione,
+per poter essere verificata con sistema di tipi diverso, deve essere tradotta.
 Nasce dunque l'esigenza di favorire l'interoperabilità tra questi sistemi, in
 modo da arginare questo problema e favorire lo sviluppo scientifico. 
 
 \subsection{Dedukti}
-Dedukti\footnote{"dedurre" in esperanto} è un \textit{logical framework}, ovvero
+Dedukti\footnote{``Dedurre'' in Esperanto} è un \textit{logical framework}, ovvero
 un meta-sistema che consente di definire logiche e teoremi usando tali logiche.
-È sviluppato da alcuni ricercatori del \textit{Institut national de recherche
-en informatique et en automatique} francese. Il software è open source, scritto
+È sviluppato da alcuni ricercatori del \textit{Institut National de Recherche
+en Informatique et en Automatique} francese. Il software è open source, scritto
 nel linguaggio di programmazione OCaml e distribuito secondo i termini della
 CeCILL-B License. Uno degli obbiettivi principali di Dedukti è creare
 una connessione tra i diversi sistemi di dimostrazione assistita. Ciò significa
@@ -300,14 +309,15 @@ Mentre il sistema di tipi è definito dalle seguenti regole:
 \end{prooftree}
 
 \subsection{Matita}
-Matita è un  proof assistant in sviluppo nel dipartimento di informatica dell'
-Università di Bologna. È open source, scritto nel linguaggio di programmazione 
-OCaml ed è rilasciato secondo i termini della GNU General Public Licence.
+Matita è un  proof assistant in sviluppo nel dipartimento di Informatica Scienze
+e Ingegneria dell'Università di Bologna. È open source, scritto nel linguaggio di
+programmazione OCaml ed è rilasciato secondo i termini della GNU General Public Licence.
 È basato sul \textit{calcolo delle costruzioni (co)induttive} (CIC), una teoria di tipi
 dipendenti che estende il \textit{calcolo delle costruzioni} sviluppato da
 Thierry Coquand aggiungendo i tipi induttivi, ovvero tipi autoreferenziali.
 Le regole di tipaggio del CIC per i tipi semplici sono quelle comuni dei linguaggi
-di programmazione. Di seguito sono riportate quelle per le  $\lambda$-astrazioni e le applicazioni 
+di programmazione. Di seguito sono riportate quelle per le  $\lambda$-astrazioni
+e le applicazioni 
 
 \begin{prooftree}
   \AxiomC{$\Gamma$, x : A $\vdash$ M : T}
@@ -327,17 +337,17 @@ CIC è più ricco del $\lambda\Pi$ modulo usato da Dedukti in quanto consente di
 \textit{tipi induttivi}, \textit{punti fissi} e \textit{pattern matching}.
 I primi consentono la creazione di tipi complessi e autoreferenziali.
 Possono essere utilizzati per definire strutture matematiche illimitate come liste,
-alberi o grafi. L'esempio seguente mostra come si può definire una lista concatenata
-di numeri naturali usando Matita. Una lista di questo tipo può essere vista come
+alberi o grafi. L'esempio seguente mostra come si possa definire una lista concatenata
+di numeri naturali usando Matita. Una struttura di questo tipo può essere vista come
 una lista vuota oppure una coppia formata da un numero naturale e un'altra lista 
 concatenata:
 
-\begin{lstlisting}
+\begin{lstlisting}[mathescape]
 include "basics/pts.ma".
 
-inductive list : Type[0] =
+inductive list : Type[0] $\stackrel{\text{def}}{=}$
    E : list
- | C : nat → list → list.
+ | C : nat $\rightarrow$ list $\rightarrow$ list.
 
 \end{lstlisting}
 
@@ -349,10 +359,10 @@ di una \texttt{list} definita nell'esempio precedente. La funzione ragiona sulla
 struttura della lista usando il pattern matching.
 
 \begin{lstlisting}
-let rec len l on l =
+let rec len l on l $\stackrel{\text{def}}{=}$
  match l with
- [ E ⇒ 0
- | C hd tl ⇒ 1 + len tl
+ [ E $\Rightarrow$ 0
+ | C hd tl $\Rightarrow$ 1 + len tl
  ].
 \end{lstlisting}
 
@@ -407,10 +417,11 @@ che alla fine del processo verrà scritta sul file \textit{.dk} di output.
 \textit{uno a uno}, ma determinati tipologie di termini Matita vengono codificati
 in più termini Dedukti.
 
-\subsection{L'encoding}
+\subsection{L'encoding}\label{sottoSezioneEncoding}
+kdjsaoijdisa
 %TODO IDk what to write
 
-\section{Problemi di Krajono}
+\section{I problemi di Krajono}\label{sezioneProblemiKrajono}
 
 
 \chapter{Da Dedukti a Matita}
@@ -456,11 +467,9 @@ del modulo Dedukti e l'identificatore del termine.
 
 \subsection{Definizioni e Dichiarazioni}
 
-\subsubsection{Costanti}
-Per tradurre le costanti è stato necessario semplicemente convertire il nome
-Dedukti in un \textit{uri} Matita. Per evitare conflitti con i nomi si è aggiunto
-anche una tabella hash che per tenere traccia dei nomi già assegnati e dei 
-relativi uri.
+\paragraph{Costanti}
+Per tradurre le costanti viene semplicemente convertito il nome Dedukti in un 
+uri Matita, controllando la tabella dei nomi per evitare conflitti.
 
 \paragraph{Indici di De Brujin}
 Entrambi i software fanno uso degli indici di De Brujin, una rappresentazione
@@ -468,89 +477,107 @@ compatta delle variabili legate all'interno di un termine. Sono utilizzati per
 semplificare la manipolazione dei termini, eliminando la necessità di utilizzare
 nomi unici per le variabili e consentendo di eseguire operazioni come la 
 sostituzione e il confronto tra termini in modo efficente. 
-Essendo un indice rappresentato da un intero la conversione è stata diretta.
-L'unica accortezza presa è stata l'aggiungere $1$ ad ogni indice in quanto
-Matita fa uso di un sistema \textit{$1$ based} mentre Dedukti conta partendo
-da $0$.
+Essendo un indice rappresentato da un intero la conversione è diretta.
+L'unica accortezza è il sommare $1$ a ciascun indice in quanto
+Dedukti fa uso di un sistema \textit{$0$ based} mentre Matita conta partendo
+da $1$.
 
-\paragraph{$\beta$-riduzione}
-In Dedukti il passo di $\beta$-riduzione è rappresentato tramite una tripla
+\paragraph{Applicazione}
+In Dedukti l'applicazione di una funzione è rappresentata tramite una tripla
 contenente: 
 \begin{itemize}
-  \item Un termine rappresentante la $\lambda$ astrazione da ridurre
-  \item Un termine rappresentante il primo argomento da usare per la riduzione
-  \item Una lista di termini rappresentante il resto degli argomenti
+  \item Un termine che rappresenta la funzione da applicare
+  \item Un termine che rappresenta il primo argomento da passare alla funzione
+  \item Una lista di termini che rappresenta il resto degli argomenti da passare
 \end{itemize}
-Per tradurlo è stato sufficiente tradurre individualmente, ricorsivamente, ciascuno
-di questi termini, e assemblarli costruendo un oggetto che rappresenta la 
-$\beta$-riduzione in Matita. 
-L'esportazione del capitolo \ref{capitoloExport} utilizza delle particolari
-definizioni per rappresentare alcuni termini di Matita %TODO all the cic.stuff
+
+La traduzione consiste nel tradurre individualmente, ricorsivamente, ciascuno
+di questi termini, e assemblarli costruendo un oggetto che rappresenta l'applicazione
+in Matita. 
 
 \paragraph{$\lambda$-astrazione e prodotto}
-Astrazioni lambda e prodotti condividono la stessa struttura e pertanto sono
-rappresentati allo stesso modo sia in Dedukti che in Matita.
+Astrazioni lambda e prodotti condividono la stessa struttura e pertanto sia in Dedukti
+che in Matita sono rappresentati in modo estremamente simile.
 Nel primo sono rappresentati come una tripla contenente
 \begin{itemize}
-  \item Un identificativo Dedukti
+  \item Un identificativo del termine
   \item Un termine rappresentante il tipo della $\lambda$-astrazione o del prodotto
   \item Un termine rappresentante il corpo
 \end{itemize}
-Si costruiscono quindi i relativi oggetti Matita convertendo l'identificativo
-e traducendo ricorsivamente il tipo e il corpo.
+La traduzione consiste anche in questo caso nel creare un uri matita partendo dal
+identificativo di Dedukti e nel tradurre ricorsivamente il tipo e il corpo, per
+poi assemblare il tutto in un oggetto Matita.
 
-\paragraph{Type e Kind}
-Il calcolo lambda-pi usa i concetti di \textit{type} e \textit{kind}: type è
-il classico \textit{concetto di tipo} usato per la classificazione di termini,
-mentre kind è un tipo speciale rappresentante il tipo di tutti i tipi. Ad 
-esempio 5 può avere tipo $nat$, mentre $nat$ TODO avere kind $*$. Nel 
-calcolo delle costruzioni (co)induttive alla base di Matita questi concetti
-non sono presenti, e pertanto non sono stati tradotti. %TODO add info about sort and univs
+\paragraph{Type e kind}
+Il $\lambda-\Pi$-modulo usato da Dedukti rappresenta gli universi usando
+\textit{type} e \textit{kind}: il primo rappresenta l'insieme dei tipi
+dei termini, mentre il secondo rappresente l'insieme dei tipi dei tipi.
+Ad esempio il numero $5$ ha type $nat$ e $nat$ ha kind $*$.  (TODO)
+%TODO
 
 \section{Invertire l'esportazione}
-Fino adesso è stato visto come importare in Matita del codice Dedukti semplice,
-tuttavia, se si volesse importare del codice precedentemente esportato usando
-la funzionalità del capitolo \ref{capitoloExport}, ci si accorgerebbe della 
-scomparsa di alcuni costrutti Matita, come ad esempio il \textit{match}. Questo
-perché, dato che Dedukti non li possiede, durante l'esportazione sono stati
-trasformati in termini che ne emulano il comportamento. Per rendere dunque possibile
-la costruzione di un codice quanto più vicino all'originale si ha pensato ed 
-implementato la strategia qua successivamente discussa.
+Durante la codifica applicata durante l'esportazione con Krajono vengono perse
+informazioni su alcuni costrutti. Ad esempio, un tipo induttivo viene rappresentato
+attraverso un insieme di definizioni e regole di riscrittura, ma durante questo processo
+si perde l'informazione che si tratta di un tipo induttivo. Pertanto se si vuole 
+importare del codice Matita precedentemente esportato, non è sufficente quanto descritto
+nella sezione precedente. Per poter ricostruire i termini Matita originali è necessario
+applicare qualche accorgimento.
 
 \subsection{L'uso delle pragma}
-Il linguaggio di Dedukti da la possibilità all'utente di scrivere delle 
-\textit{direttive} o \textit{pragma}. Queste sono delle particolari righe di
-codice interpretate dal compilatore e che pertanto non fanno parte del programma.
-Usandole è possibile istruire il compilatore Dedukti, o nel nostro caso il parser
-Dedukti integrato dentro Matita \ref{parserDedukti}, affinché agisca in determinati
-modi quando le incontra. 
-Nel caso specifico di questa tesi, sono state definite e usate delle pragma
-per indicare quali parti di codice Dedukti che fanno riferimento a un costrutto 
-Matita andato perso durante l'esportazione.
+Dedukti da la possibilità all'utente di scrivere delle \textit{direttive} o \textit{pragma}.
+Queste sono delle righe di codice speciali interpretate solo dal compilatore 
+e che non fanno parte del programma stesso. Attraverso l'uso di tali direttive,
+è possibile fornire istruzioni specifiche a Dedukti affinché agisca in modi
+particolari quando le incontra. Nel contesto di Matita, queste direttive vengono
+utilizzate per aggiungere informazioni durante l'esportazione in modo che,
+durante l'importazione, sia possibile ricostruire correttamente i termini.
 
-\paragraph{Sintassi} Le pragma sono sostanzialmente delle stringhe, quindi
-è stato necessario pensare a uno standard che aiutasse a strutturarle e 
-ne facilitasse il parsing. Dato che la traduzione di un costrutto Matita in 
-Dedukti può risultare in un blocco di istruzioni bisogna essere in grado di
-capire dove questo inizia e finisce. Inoltre, per poter ricostruire un oggetto
-talvolta è necessario salvare degli attributi aggiuntivi, specificando anche
-a quale oggetto fanno riferimento. Per tanto si è pensato di inserire pragma
-con la seguente sintassi:
+La codifica di un termine Matita può risultare in un blocco di termini Dedukti,
+le direttive pragma forniscono informazioni sull'inizio e la fine di tale blocco.
+In aggiunta, al fine di ricostruire correttamente i termini, a volte è necessario
+conservare attributi aggiuntivi e specificare a quale termine si riferiscono.
+Di conseguenza, le pragma contengono anche queste informazioni.
 
+Le direttive vengono rappresentate internamente come stringhe di testo, e per
+semplificarne l'analisi viene utilizzato uno standard specifico:
 \begin{center}
   \texttt{\#PRAGMA [BEGIN|END] <NOME> [ATTR[:rif]=val]... .}
 \end{center}
-Le seguenti pragma ad esempio sono valide
+
+Ad esempio
 \begin{itemize}
-  \item  \texttt{\#PRAGMA FOO BAR=42.} L'istruzione successiva è di tipo
-\texttt{FOO} e ha l'attributo \texttt{BAR} che vale \texttt{42}.
-  \item  \texttt{\#PRAGMA BEGIN BLOCK GREETINGS:world=hello.} Inizia un blocco di
-    tipo \texttt{BLOCK} con l'attributo \texttt{GREETINGS} di valore \texttt{hello}
-    che fa riferimento a \texttt{world}.
-  \item  \texttt{\#PRAGMA END BLOCK.} Fine di un blocco di tipo \texttt{BLOCK}
+  \item  \texttt{\#PRAGMA FOO BAR=42 BAZ=43.} Significa: \textit{L'istruzione successiva è di tipo
+    \texttt{FOO} e posside un attributo \texttt{BAR} con valore \texttt{42} e 
+    un attributo \texttt{BAZ} con valore \texttt{43}}.
+
+  \item  \texttt{\#PRAGMA BEGIN BLOCK GREETINGS:world=hello.} Significa: \textit{
+    Inizia un blocco di tipo \texttt{BLOCK} con attributo \texttt{GREETINGS} di 
+    valore \texttt{hello} facente riferimento a \texttt{world}}.
+
+  \item  \texttt{\#PRAGMA END BLOCK.} Significa: \textit{Fine di un blocco di tipo
+    \texttt{BLOCK}}.
 \end{itemize}
 
-\subsection{Punto fisso}
+\subsection{Costanti cic}
+Come descritto nella sezione \ref{sottoSezioneEncoding}, durante il processo di
+codifica, vengono utilizzate alcune costanti definite nel modulo Dedukti chiamato
+``cic''. Per ricostruire i termini esportati utilizzando queste funzioni, la funzione
+responsabile della traduzione delle applicazioni si occupa anche di gestire ciascuna
+di queste costanti in modo specifico, affrontando i casi uno per uno. 
+
+Nel caso della
+costante \texttt{cic.prod}, se viene applicata a un'astrazione con un corpo definito,
+si procede con la costruzione dell'oggetto Matita che rappresenta il prodotto. In caso
+contrario, si genera un errore poiché ciò risulta impossibile.
+
+Nel caso delle costanti \texttt{cic.univ} e \texttt{cic.Univ}, viene costruito un
+oggetto Matita che rappresenta una sorta. Se vengono applicate a una costante
+\texttt{cic.prop}, il tipo dell'oggetto Matita sarà "prop" (ovvero una sorta di
+tipo proposizionale). Se, invece, vengono applicate a una costante \texttt{cic.type},
+si procede a effettuare un conteggio ricorsivo del numero dell'universo.
+
+\subsection{Punto fisso} 
 Dato un insieme $A$ e una funzione $f: A \rightarrow A$, $x \in A$ si dice
 \textit{punto fisso di f} se e solo se $x = f(x)$. Nella teoria dei tipi 
 questo concetto è utile per rappresentare le funzioni ricorsive.
@@ -560,7 +587,8 @@ quanto Matita ne fa uso mentre Dedukti no.
 \paragraph{Punto fisso nell'encoding} Un'istruzione di tipo punto fisso è tradotta
 come un insieme di astrazioni lambda e delle regole di riscrittura. In particolare
 per ciascun punto fisso si ottengono un'astrazione e una regola per rappresentare
-il tipo e un'astrazione e una regola per rappresentare il corpo.
+il tipo e un'astrazione e una regola per rappresentare il corpo. 
+
 
 \paragraph{La pragma} Per poter ricostruire l'oggetto Matita iniziale, oltre
 a individuare tipo e corpo, è necessario anche conoscere un parametro chiamato
