@@ -1,13 +1,29 @@
-\documentclass[12pt,a4paper]{report}
-\usepackage[italian]{babel}
-\usepackage[utf8]{inputenc}
+\documentclass[12pt,a4paper]{mimosis}
 \usepackage{newlfont}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{graphicx}
 \usepackage{listings}
-\usepackage{fancyhdr}
 \usepackage{styles/bussproofs}
+
+\usepackage[
+  autocite     = plain,
+  backend      = bibtex,
+  doi          = true,
+  url          = true,
+  giveninits   = true,
+  hyperref     = true,
+  maxbibnames  = 99,
+  maxcitenames = 2,
+  sortcites    = false,
+  style        = numeric,
+  ]{biblatex}
+
+\input{bibliography-mimosis}
+
+\addbibresource{tesi.bib}
+
+
 \graphicspath{ {./pic/} }
 
 \lstset{language=Caml}
@@ -16,10 +32,6 @@
 \lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
 
 \begin{document}
-\pagestyle{fancy}
-\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
-\fancyhead[R]{}
-\fancyhead[L]{\chaptername\ \thechapter\ --\ \leftmark}
 
 \begin{titlepage}
   \begin{center}
@@ -57,8 +69,8 @@
 \end{titlepage}
 
 
-\begin{abstract}
-\end{abstract}
+% \begin{abstract}
+% \end{abstract}
 
 \thispagestyle{empty}
 \tableofcontents
@@ -95,7 +107,7 @@ ricostruzione del codice originale. Ciò è stato risolto dotando l'export di
 un meccanismo per preservarle dove necessario. In secondo luogo i sistemi di tipi
 codificati in Dedukti, per essere consistenti, richiedono che le regole di riscrittura
 scelte dagli sviluppatori per implementare la codifica siano confluenti e normalizzanti.
-Dedukti non effettua questa verifica, che demanda ad altri strumenti. Matita, invece, impone
+Dedukti non effettua questa verifica, che demanda a altri strumenti. Matita, invece, impone
 un insieme molto restrittivo di controlli sintattici per garantire confluenza e terminazione,
 che sono in generale proprietà indecidibili. Pertanto, quando si inverte il processo di
 esportazione, sorge la necessità di ricostruire termini che soddisfino le condizioni 
@@ -113,7 +125,7 @@ assistant} e il problema della loro interoperabilità.
 \section{La teoria dei tipi} \label{teoriaDeiTipi}
 \subsection{La teoria dei tipi}
 La \textit{teoria dei tipi} è una branca della logica e dell'informatica teorica il
-cui obbiettivo è quello di studiare i così detti \textit{type system}, ovvero
+cui obiettivo è quello di studiare i cosiddetti \textit{type system}, ovvero
 insiemi di regole che associano una proprietà chiamata \textit{tipo} a degli oggetti
 chiamati \textit{termini}. Intuitivamente, assegnare un tipo a un termine significa
 assegnare al termine un'etichetta che rappresenta la natura del termine stesso.
@@ -335,8 +347,10 @@ e le applicazioni
 
 CIC è più ricco del $\lambda\Pi$ modulo usato da Dedukti in quanto consente di definire 
 \textit{tipi induttivi}, \textit{punti fissi} e \textit{pattern matching}.
-I primi consentono la creazione di tipi complessi e autoreferenziali.
-Possono essere utilizzati per definire strutture matematiche illimitate come liste,
+
+
+I tipi induttivi consentono la creazione di tipi complessi e autoreferenziali e possono
+essere utilizzati per definire strutture matematiche illimitate come liste,
 alberi o grafi. L'esempio seguente mostra come si possa definire una lista concatenata
 di numeri naturali usando Matita. Una struttura di questo tipo può essere vista come
 una lista vuota oppure una coppia formata da un numero naturale e un'altra lista 
@@ -351,12 +365,11 @@ inductive list : Type[0] $\stackrel{\text{def}}{=}$
 
 \end{lstlisting}
 
-Invece i punti fissi sono utili per definire funzioni ricorsive e, con l'aggiunta
-del pattern matching, definiscono funzioni ricorsive strutturali.
-
-Il seguente esempio mostra l'implementazione di una funzione che calcola la lunghezza
-di una \texttt{list} definita nell'esempio precedente. La funzione ragiona sulla
-struttura della lista usando il pattern matching.
+I punti fissi sono utili per definire funzioni ricorsive, mentre l'aggiunta del
+pattern matching permette di definire funzioni ricorsive strutturali. Un esempio
+concreto di ciò è l'implementazione di una funzione per calcolare la lunghezza
+di una lista, basata sul pattern matching per ragionare sulla struttura della 
+lista stessa.
 
 \begin{lstlisting}
 let rec len l on l $\stackrel{\text{def}}{=}$
@@ -379,39 +392,40 @@ et en automatique} ha sviluppato Krajono \footnote{Significa "Matita" in Esperan
 \footnote{https://github.com/Deducteam/Krajono}. Krajono ha la possibilità
 di esportare definizioni e teoremi dati in Matita verso Dedukti. Per far ciò
 sfrutta una codifica del calcolo di Matita nel metalinguaggio di Dedukti. 
-Tuttavia attualmente questo fork non è più mantenuto da anni.
+Tuttavia questo fork non è più mantenuto da anni.
 
 \subsection{Integrazione in Matita}
-In prima battuta, il progetto consiste in un'integrazione delle funzionalità di export di
-Krajono nel Matita baseline. Tali funzionalità sono presenti in Matita grazie alla 
-copia dei singoli sorgenti responsabili dell'esportazione. 
+In prima battuta, il progetto consiste nell'integrare le funzionalità di 
+esportazione di Krajono nella versione base di Matita. Tali funzionalità sono
+state ottenute copiando i singoli sorgenti responsabili dell'esportazione 
+all'interno di Matita.
 
-Le funzionalità non vengono integrate mediante \textit{pull request} da una
-repository \textit{Git} all'altra in quanto comporterebbe delle complicazioni
-visto che Krajono non solo non è mantenuto da anni, ma è basato ma su un ulteriore
-fork di Matita, chiamato \textit{Matita with embedded Elpi}\footnote{https://github.com/LPCIC/matita}. 
+Integrare direttamente queste funzionalità tramite \textit{pull request} tra
+i \textit{repository Git}, comporterebbe complicazioni. Questo
+è principalmente dovuto al fatto che Krajono non è stato mantenuto da anni ed
+è basato su un fork separato di Matita chiamato Matita\textit{Matita with embedded
+Elpi}\footnote{https://github.com/LPCIC/matita}. 
 
-Il codice sorgente responsabile dell'esportazione è diviso in pochi moduli OCaml
-quasi del tutto indipendenti dal restante codice sorgente di Matita, per tanto
-integrarli nel Matita moderno non causa problemi.
 
 \section{L'export}
 \subsection{Il processo di esportazione}
-\textit{Matitac} è il compilatore da linea di comando di Matita. Se lo si lancia
+\textit{Matitac} è il compilatore da linea di comando di Matita, se lo si lancia
 compila tutti i file con estensione \textit{.ma} presenti nella directory corrente. 
-Opzionalmente, passando come argomento il nome di un file, è possibile anche 
-compilare solo quello singolarmente. Krajono fornisce la possibilità di attivare
-la funzionalità di export specificando l'argomento \texttt{-extract\_dedukti} a Matitac,
+Oppure è possibile compilare un singolo file passando come argomento il suo
+nome.
+
+Krajono fornisce la possibilità di attivare la funzionalità di export specificando l'argomento \texttt{-extract\_dedukti} a Matitac,
 sia lavorando con un unico file sia con un'intera directory. A processo concluso 
 si potranno trovare, nella directory dei sorgenti, i file \textit{.dk} contenente
 il codice matita esportato.
 
-Quando il suddetto flag è attivo il motore di Matita avvia l'esportazione chiamando
-una funzione di uno dei moduli OCaml importati da Krajono. Questi moduli compiono
-delle analisi del tipo e della struttura del termine Matita con lo scopo di
-capire come applicare l'encoding appropriato. Una volta costruiti, i termini
-Dedukti risultanti dalla codifica vengono inseriti in una tabella hash
-che alla fine del processo verrà scritta sul file \textit{.dk} di output.
+Quando il flag menzionato è attivato, il motore di Matita avvia il processo di
+esportazione chiamando una specifica funzione da uno dei moduli OCaml importati
+da Krajono. Questi moduli compiono delle analisi del tipo e della struttura del
+termine Matita, con lo scopo di capire come applicare l'encoding appropriato.
+Una volta costruiti, i termini Dedukti risultanti dalla codifica vengono inseriti
+in una tabella hash, che alla fine del processo verrà scritta sul file \textit{.dk}
+di output.
 
 È importante notare come il processo di esporazione non è sempre un encoding
 \textit{uno a uno}, ma determinati tipologie di termini Matita vengono codificati
@@ -434,7 +448,7 @@ Come visto nel capitolo \ref{capitoloExport}, Krajono consente l'esportazione de
 Matita verso Dedukti, tuttavia non è possibile fare il contrario. L'export è dunque 
 a senso unico e qualcosa esportato da Krajono non può essere re-importato. In seconda
 battuta, il progetto consiste nell'implementazione di una funzionalità di \textit{import}
-che permetta ad un utente di includere e utilizzare file Dedukti in Matita.
+che permetta a un utente di includere e utilizzare file Dedukti in Matita.
 
 \subsection{Il parser Dedukti}\label{sottoSezioneParserDedukti}
 Per poter analizzare il file Dedukti, Matita sfrutta delle funzioni rese disponibili
@@ -578,55 +592,128 @@ tipo proposizionale). Se, invece, vengono applicate a una costante \texttt{cic.t
 si procede a effettuare un conteggio ricorsivo del numero dell'universo.
 
 \subsection{Punto fisso} 
-Dato un insieme $A$ e una funzione $f: A \rightarrow A$, $x \in A$ si dice
-\textit{punto fisso di f} se e solo se $x = f(x)$. Nella teoria dei tipi 
-questo concetto è utile per rappresentare le funzioni ricorsive.
-Questo è uno di quei costrutti che viene perso durante l'esportazione, in 
-quanto Matita ne fa uso mentre Dedukti no.
-
-\paragraph{Punto fisso nell'encoding} Un'istruzione di tipo punto fisso è tradotta
-come un insieme di astrazioni lambda e delle regole di riscrittura. In particolare
-per ciascun punto fisso si ottengono un'astrazione e una regola per rappresentare
-il tipo e un'astrazione e una regola per rappresentare il corpo. 
+Un'istruzione di tipo punto fisso viene tradotta come un insieme di astrazioni 
+lambda e regole di riscrittura. In particolare, per ogni punto fisso vengono 
+create un'astrazione e una regola per rappresentare il tipo, e un'altra astrazione
+e un'altra regola per rappresentarne il corpo.
 
 
 \paragraph{La pragma} Per poter ricostruire l'oggetto Matita iniziale, oltre
 a individuare tipo e corpo, è necessario anche conoscere un parametro chiamato
 \textit{recno}. Questo è un indice (\textit{0-based}) che serve a individuare
 su quale argomento della funzione avviene la ricorsione. Il valore però viene
-anch'esso perso durante l'esportazione, quindi è stato necessario trovare un
-modo per preservarlo. Per conservare queste informazioni si è modificato il
-codice dell'esportazione in modo da inserire delle pragma come delimitatori
-del blocco di istruzioni Dedukti rappresentanti l'encoding del fixpoint.
-In particolare la pragma per indicare l'inizio del blocco è nella forma:
+perso durante l'esportazione di Krajono.
+Per preservare queste informazioni durante l'esportazione, Matita aggiunge 
+una coppia di pragma per delimitare per ciascun blocco di termini che rappresenta 
+la codifica di un punto fisso. In tali direttive sono presenti anche gli attributi
+necessari alla ricostruzione. La pragma di apertura del blocco è nella forma:
 \begin{center}
-\texttt{\#PRAGMA BEGIN FIXPOINT NAME=name RECNO:name=0}
+\texttt{\#PRAGMA BEGIN FIXPOINT NAME=name RECNO:name=0.}
 \end{center}
 Mentre la pragma di chiusura è nella forma:
 \begin{center}
-\texttt{\#PRAGMA END FIXPOINT}
+\texttt{\#PRAGMA END FIXPOINT.}
 \end{center}
 
-L'attributo \texttt{NAME} rappresenta il nome della funzione, e ce ne possono
-essere più di uno nel caso in cui si abbia della ricorsione mutua. Il \textit{recno}
-viene esplicitato nell'omonimo attributo, specificando anche a quale nome fa
-riferimento. Nel caso di ricorsione mutua si potrebbe ottenere una pragma nella
-forma:
+L'attributo \texttt{NAME} rappresenta il nome della funzione e può esserci più
+di un nome nel caso in cui si verifichi una ricorsione mutua. In altre parole,
+se diverse funzioni si richiamano a vicenda in modo ricorsivo, ciascuna di esse
+avrà un proprio attributo \texttt{NAME} che rappresenta il suo nome specifico.
+Questo permette di distinguere le diverse funzioni coinvolte nella ricorsione 
+mutua e di gestirle correttamente durante la costruzione dell'oggetto Matita.
+Il \textit{recno} viene esplicitato dall'omonimo attributo, specificando anche
+a quale funzione fa riferimento. Nel caso di ricorsione mutua, un esempio di
+pragma è:
 \begin{center}
-\texttt{\#PRAGMA BEGIN FIXPOINT NAME=f NAME=g RECNO:f=0 RECNO:g=1}
+\texttt{\#PRAGMA BEGIN FIXPOINT NAME=f NAME=g RECNO:f=0 RECNO:g=1.}
 \end{center}
 
 \paragraph{Il corpo}
+La regola di riscrittura associata al corpo contiene il corpo del punto fisso
+a cui fa riferimento. Tuttavia non è possibile identificare una determinata
+regola di riscrittura in quanto non possiedono un identificativo di alcun 
+tipo. Per capire quale regola tradurre Matita usa un ulteriore pragma:
+\begin{center}
+  \texttt{\#PRAGMA FIXPOINT\_BODY REF=name.}
+\end{center}
 
-\subsection{Tipi induttivi}
+Grazie all'attributo \texttt{REF}, è possibile ricostruire l'oggetto puntofisso originale
+in quanto memorizza a quale funzione fa riferimento il corpo.
 
-\subsection{pattern matching}
+\subsection{Tipi induttivi}\label{sottoSezioneTipiInduttivi}
+Ciascuna definizione di un tipo induttivo in Matita viene esportata usando
+una grande quantità di termini Dedukti e regole di riscrittura. In particolare
+\begin{itemize}
+  \item Una definizione che rappresenta il tipo del tipo induttivo.
+  \item Per ogni costruttore del tipo, una definizione che rappresenta il
+    tipo del costruttore.
+  \item Una coppia di costanti e quattro regole di riscrittura per ogni universo
+    e per \textit{prop}. Queste fanno parte della codifica del pattern matching.
+  \item Una lunga lista di costanti e regole di riscrittura. Queste rappresentano
+    termini creati automaticamente dal runtime di Matita al momento della
+    definizione del tipo induttivo e per tanto possono essere ignorati.
+\end{itemize}
 
-\subsection{Pragma generated}
+\paragraph{La pragma}
+Per poter ricostruire un tipo induttivo Matita ha bisogno di poter risalire
+ai suoi costruttori e a un attributo intero chiamato \textit{leftno} che 
+rappresenta il numero di \textit{parametri sinistri} del tipo induttivo.
+Anche in questo caso, al fine di preservare le informazioni che altrimenti
+andrebbero perse durante l'esportazione, Matita aggiunge una coppia di pragma
+per ogni blocco che rappresenta la codifica di un tipo induttivo.
+La pragma che apre il blocco presenta la seguente forma:
+\begin{center}
+  \texttt{\#PRAGMA BEGIN INDUCTIVE NAME=name LEFTNO=0 CONS:name=cons1 CONS:name=cons2.}
+\end{center}
+
+Mentre quella di chiusura:
+\begin{center}
+  \texttt{\#PRAGMA END INDUCTIVE.}
+\end{center}
+
+Per ogni tipo induttivo, vengono aggiunti un attributo \texttt{NAME} che indica 
+il nome del tipo e una lista di attributi \texttt{CONS} il cui valore corrisponde
+ai nomi dei vari costruttori, ciascuno con un riferimento al tipo associato.
+Viene aggiunto inoltre l'attributo \texttt{LEFTNO} per preservare il numero di
+parametri sinistri.
+
+\subsection{Codice generato}
+Come descritto nella sezione \ref{sottoSezioneTipiInduttivi}, in alcuni casi
+Matita genera automaticamente dei termini. Questi termini sono validi e vengono
+esportati. Tuttavia, è importante notare che non devono essere importati, poiché
+se si importano i termini che li hanno generati, Matita li ricreerà automaticamente.
+
+Per indicare che un blocco rappresenta un termine che è stato generato automaticamente,
+Matita aggiunge una pragma prima e dopo il blocco durante la fase di esportazione.
+La pragma di apertura usata ha la seguente forma:
+\begin{center}
+  \texttt{\#PRAGMA BEGIN GENRATED.}
+\end{center}
+
+mentre quella di chiusura:
+\begin{center}
+  \texttt{\#PRAGMA END GENRATED.}
+\end{center}
+
+In questo modo, durante l'importazione, Matita è in grado di individurare i
+blocchi generati e di ignorarli.
+
+
 
 \chapter{Conclusioni \& sviluppi futuri}
+
+\printbibliography
+
 
 % bio
 % http://www.cs.unibo.it/~ricciott/PAPERS/system_description2011_draft.pdf
 \end{document}
+
+% cose che si potrebbero eventualmente fare
+% ------------------------------------
+% parametri sinistri
+% aggiungere sul puntofisso e sul match
+% aggiungere immagini su engine -> parser -> import -> engine
+% aggiungere immagine su tutti che puntano verso dk
+% sulle regole di riscrittura
 
