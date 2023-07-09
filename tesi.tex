@@ -485,8 +485,68 @@ di output.
 in più termini Dedukti.
 
 \subsection{L'encoding}\label{sottosezioneEncoding}
-kdjsaoijdisa
-%TODO IDk what to write
+La codifica è composta da una serie di definizioni ed è contenuta dentro 
+un modulo Dedukti chiamato ``cic''. 
+Comprendere il funzionamento di questo modulo è essenziale per eseguire l'operazione
+di importazione descritta nella sezione \ref{sezioneInvertireExport}, quindi 
+verranno esaminati i punti più importanti.
+
+Il modulo inizia fornendo le definizioni necessarie per rappresentare i numeri
+naturali e l'operazione di massimo tra due numeri:
+
+\begin{lstlisting}
+Nat : Type.
+
+z : Nat.
+s : Nat -> Nat.
+
+def m : Nat -> Nat -> Nat.
+[i] m i z --> i.
+[j] m z j --> j.
+[i, j] m (s i) (s j) --> s (m i j).
+\end{lstlisting}
+
+È interessante vedere all'opera le regole di riscrittura per definire la costante
+\texttt{m}. 
+
+In seguito si procede alla codifica degli universi. Innanzitutto, viene definito
+il tipo \texttt{Sort} per rappresentare le sorte e successivamente vengono definite
+la sorta \texttt{prop} e una funzione per rappresentare i diversi universi.
+
+\begin{lstlisting}
+Sort : Type.
+
+prop : Sort.
+type : Nat -> Sort.
+\end{lstlisting}
+
+Il naturale che \texttt{type} richiede in input rappresenta il numero dell'universo.
+Ad esempio, l'universo \texttt{Type[3]} viene codificato come
+\begin{lstlisting}
+  type (s (s (s z)))
+\end{lstlisting}
+
+Più avanti nel modulo si passa alla codifica dei tipi.
+Viene fornita la definizione di \texttt{Univ}, che accetta una sorta e restituisce 
+un \texttt{Type} che rappresenta \textit{il codice} della sorta.
+
+\begin{lstlisting}
+Univ : Sort -> Type.
+\end{lstlisting}
+
+In seguito, si procede alla definizione della codifica dei termini utilizzando 
+la definizione di \texttt{Term}. Questa funzione accetta una sorta, la sua
+codifica associata e restituisce il termine corrispondente.
+
+\begin{lstlisting}
+def Term : s : Sort -> a : Univ s -> Type.
+\end{lstlisting}
+
+Viene poi definita \texttt{univ} con lo scopo di ritornare l'universo di una
+data sorta.
+\begin{lstlisting}
+univ : s : Sort -> Univ (succ s).
+\end{lstlisting}
 
 \section{I problemi dell'export}
 
@@ -518,14 +578,15 @@ Infine, l'esportazione non tiene traccia delle dipendenze tra i diversi moduli D
 elaborati. Di conseguenza, i file esportati non contengono alcuna informazione che li
 colleghi alle loro dipendenze, obbligando l'utente a ricostruirle manualmente.
 
-\subsection{Problemi teorici}
+\subsection{Perdita di informazione}
+\paragraph{Normalizzazione e confluenza}
 Dal punto di vista teorico, le problematiche dell'esportazione possono essere attribuite
 alla differenza tra il $\lambda\Pi$-calcolo modulo e il calcolo delle costruzioni (co)induttive,
-e per tanto non sono risolvibili. In particolare, come evidenziato nella sezione 
+e pertanto non sono risolvibili. In particolare, come evidenziato nella sezione 
 \ref{sottosezioneDedukti}, il $\lambda\Pi$-calcolo modulo non possiede le proprietà di normalizzazione
 e confluenza che, al contrario, sono presenti nel calcolo delle costruzioni (co)induttive.
 
-\paragraph{}
+\paragraph{Proof irrelevance}
 La \textit{proof irrelevance}, è un concetto nella teoria dei tipi che afferma che la prova di una 
 proposizione o di un tipo non dovrebbe influire sul modo in cui questi vengono utilizzati.
 Ciò significa che due dimostrazioni diverse, di una stessa proposizione o tipo, possono essere
@@ -538,10 +599,19 @@ quando si ragiona su di essi.
 Durante l'esportazione, le informazioni sulla proof irrelenvance dei vari termini Matita vengono 
 completamente perse.
 
+\paragraph{Costrutti di Matita}
+Alcuni costrutti di Matita non hanno una traduzione diretta in Dedukti
+e pertanto vengono codificati come un blocco di termini. Durante la codifica
+perdono quindi la loro natura originale e con essa alcuni attributi chiave, 
+senza i quali diventa impossibile ricostruire il termine di partenza. 
+Questo rappresenta un problema che verrà affrontato nella sezione \ref{sezioneInvertireExport}. 
+
 \chapter{Da Dedukti a Matita}
 In questo capitolo viene illustrato il funzionamento del processo di importazione
-del codice Dedukti in Matita. Prima %TODO
-
+del codice Dedukti in Matita. Prima viene discussa l'integrazione del parser 
+di Dedukti, successivamente viene analizzata la strategia usata per la traduzione
+dei termini da un sistema all'altro. Infine è viene trattata la ricostruzione
+di oggetti Matita precedentemente esportati.
 
 \section{Dedukti in Matita}
 Come visto nel capitolo \ref{capitoloExport}, Krajono consente l'esportazione del codice
@@ -562,9 +632,6 @@ uno stream di entry. Queste vengono analizzate nella loro struttura per poi cost
 entry Matita equivalenti, da poi ritornare al motore.
 
 \section{L'import}
-Per la maggior parte dei termini Dedukti esiste una controparte equivalente in Matita.
-Dunque il processo di importazione si riduce al convertire un oggetto in un altro
-mettendo le informazioni giuste al posto giusto. % TODO
 
 \subsection{La gestione dei nomi}
 Per gestire i nomi dei termini Matita fa uso di una particolare stringa contenente un 
@@ -626,10 +693,13 @@ poi assemblare il tutto in un oggetto Matita.
 Il $\lambda-\Pi$-modulo usato da Dedukti rappresenta gli universi usando
 \textit{type} e \textit{kind}: il primo rappresenta l'insieme dei tipi
 dei termini, mentre il secondo rappresenta l'insieme dei tipi dei tipi.
-Ad esempio il numero $5$ ha type $nat$ e $nat$ ha kind $*$.  (TODO)
-%TODO
+Ad esempio il numero $5$ ha type $nat$ e $nat$ ha kind $*$.
+Tuttavia, per come è definita la codifica utilizzata, questo tipo di
+termini non può comparire nel codice esportato, pertanto non li si 
+traduce.
 
-\section{Invertire l'esportazione}
+
+\section{Invertire l'esportazione} \label{sezioneInvertireExport}
 Durante la codifica applicata durante l'esportazione con Krajono vengono perse
 informazioni su alcuni costrutti. Ad esempio, un tipo induttivo viene rappresentato
 attraverso un insieme di definizioni e regole di riscrittura, ma durante questo processo
@@ -672,6 +742,15 @@ Ad esempio
   \item  \texttt{\#PRAGMA END BLOCK.} Significa: \textit{Fine di un blocco di tipo
     \texttt{BLOCK}}.
 \end{itemize}
+
+Un'alternativa a questo tipo di approccio avrebbe potuto prevedere l'utilizzo
+di pragma in cui gli attributi fossero memorizzati in modo rigido e non
+\textit{human readable}. Questo da una parte avrebbe facilitato la scrittura
+del codice, ma dall'altra avrebbe reso difficoltosa la lettura e la scrittura di
+queste pragma.
+Inoltre, grazie all'aggiunta dei riferimenti sugli attributi, con questo approccio
+non si è vincolati a seguire una ordine rigido dei termini Dedukti all'interno di 
+un blocco.
 
 \subsection{Costanti CIC}
 Come descritto nella sezione \ref{sottosezioneEncoding}, durante il processo di
