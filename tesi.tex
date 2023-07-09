@@ -53,7 +53,7 @@
   \noindent
   \begin{minipage}[t]{0.47\textwidth}
   {\large{\bf Relatore:\\
-  Chiar.mo Prof.\\ % TODO 
+  Chiar.mo Prof.\\ 
   Claudio Sacerdoti Coen}}
   \end{minipage}
   \hfill
@@ -87,14 +87,18 @@ La logica, come il whisky, perde il suo effetto benefico se assunta in quantità
 \begin{center}
   \textsc{Sommario}
 \end{center}
-Dedukti è un framework logico basato sul $\lambda\Pi$-calcolo modulo, progettato
-per consentire la codifica delle logiche dei diversi proof assistant al fine di
-facilitare la condivisione di teoremi e dimostrazioni. Matita, sviluppato presso
-l'Università di Bologna, è un proof assistant basato sul calcolo delle costruzioni
-(co)induttive. Inizialmente, viene introdotta l'implementazione di una funzionalità
-di esportazione del codice da Matita a Dedukti. Successivamente, viene fornita 
-una descrizione dell'implementazione di una funzionalità di importazione in Matita
-di codice Dedukti precedentemente esportato.
+
+Dedukti è un software che agisce da type checker per definizioni, enunciati e prove
+codificati nel calcolo che implementa, il quale è sufficientemente espressivo da poter
+rappresentare anche altri calcoli. Questo rende Dedukti un framework logico con il 
+quale è possibile sviluppare un sistema di codifica che converta nel suo linguaggio
+le dimostrazioni scritte per altri proof assistant. 
+Inizialmente, si effettua un'analisi del processo di esportazione del codice da Matita
+a Dedukti. Matita è un assistente alla dimostrazione sviluppato presso l'Università di
+Bologna, basato sul calcolo delle costruzioni (co)-induttive. Successivamente, si illustra 
+la funzionalità di importazione del codice Dedukti in Matita e si esaminano le sfide che
+si presentano nel ricostruire i termini originali di Matita a partire dal codice Dedukti 
+esportato in precedenza.
 
 
 \thispagestyle{empty}
@@ -140,9 +144,9 @@ sintattiche di Matita, che sono sufficienti, ma non necessarie, e che potrebbero
 state violate durante la codifica in Dedukti, nonostante le regole fossero anche confluenti
 e normalizzanti.
 
-\chapter{Basi teoriche}
-In questo capitolo vengono trattate le conoscenze teoriche necessarie per la
-comprensione del lavoro esposto in quelli successivi. Nella sezione \ref{teoriaDeiTipi}
+\chapter{Prerequisiti}
+In questo capitolo vengono trattati prerequisiti necessari per la
+comprensione del lavoro esposto nei capitoli quelli successivi. Nella sezione \ref{teoriaDeiTipi}
 sono illustrati i fondamenti della \textit{Teoria dei Tipi}, teoria alla base 
 di questa tesi. Nella sezione \ref{proofAssistant} vengono trattati i \textit{proof 
 assistant} e il problema della loro interoperabilità.
@@ -325,7 +329,7 @@ Mentre il sistema di tipi è definito dalle seguenti regole:
 \AxiomC{$\Gamma \vdash$ A : Type}
 \AxiomC{$\Gamma,$ x : A $\vdash$ B : Type}
 \AxiomC{$\Gamma,$ x : A $\vdash$ t : B}
-\RightLabel{\textbf{$\lambda$ astrazione}}
+  \RightLabel{\textbf{$\boldsymbol{\lambda}$-astrazione}}
 \TrinaryInfC{$\Gamma \vdash \lambda$ x : A . t  : $\Pi$ x : A . B}
 \end{prooftree}
 
@@ -345,7 +349,7 @@ Mentre il sistema di tipi è definito dalle seguenti regole:
 \TrinaryInfC{$\Gamma \vdash$ x : B}
 \end{prooftree}
 
-\paragraph{Regole di riscrittura}
+\paragraph{Regole di riscrittura} \label{sottosezioneDedukti}
 Le regole di riscrittura definiscono come trasformare o riscrivere espressioni
 o termini secondo determinate regole specificate. Sono utili, ad esempio, per
 implementare il processo di $\beta$-riduzione, che rappresenta il passo di 
@@ -381,8 +385,8 @@ di programmazione. Di seguito sono riportate quelle per le  $\lambda$-astrazioni
 e le applicazioni 
 
 \begin{prooftree}
-  \AxiomC{$\Gamma$, x : A $\vdash$ M : T}
-  \RightLabel{\textbf{$\lambda$-astrazione}}
+  \AxiomC{$\Gamma$, x : A $\vdash$ M : B}
+  \RightLabel{\textbf{$\boldsymbol{\lambda}$-astrazione}}
   \UnaryInfC{$\Gamma \vdash (\lambda $x : A . M) : A $\rightarrow$ B}
 \end{prooftree}
 
@@ -457,7 +461,7 @@ Elpi}\footnote{https://github.com/LPCIC/matita}.
 
 
 \section{L'export}
-\subsection{Il processo di esportazione}
+\subsection{Il processo di esportazione}\label{sottosezioneProcessoDiExport}
 \textit{Matitac} è il compilatore da linea di comando di Matita, se lo si lancia
 compila tutti i file con estensione \textit{.ma} presenti nella directory corrente. 
 Oppure è possibile compilare un singolo file passando come argomento il suo
@@ -480,12 +484,59 @@ di output.
 \textit{uno a uno}, ma determinati tipologie di termini Matita vengono codificati
 in più termini Dedukti.
 
-\subsection{L'encoding}\label{sottoSezioneEncoding}
+\subsection{L'encoding}\label{sottosezioneEncoding}
 kdjsaoijdisa
 %TODO IDk what to write
 
-\section{I problemi di Krajono}\label{sezioneProblemiKrajono}
+\section{I problemi dell'export}
 
+\subsection{I problemi di Krajono}
+Krajono presenta diverse problematiche, la principale delle quali è il fatto che non
+è più mantenuto da anni. È basato su una versione molto datata di Matita, che non
+solo manca delle funzionalità moderne, ma richiede anche versioni obsolete delle 
+sue dipendenze. Ciò rende Krajono difficile da installare e far funzionare.
+
+Un'altra problematica riguarda la modalità con cui l'utente avvia l'esportazione.
+Come evidenziato nella sezione \ref{sottosezioneProcessoDiExport}, l'unico modo
+per avviarla è tramite il compilatore da linea di comando di Matita.
+Questa funzionalità non è integrata nell'interfaccia grafica di Matita, né supporta
+tutte le funzionalità fornite da essa, come ad esempio la possibilità di verificare
+una dimostrazione passo dopo passo.
+
+Inoltre, Krajono non esegue l'\textit{escaping} delle \textit{keyword} di Dedukti,
+quindi quando viene esportato un termine con una keyword di Dedukti come nome, si
+ottiene del codice non funzionante. Matita risolve questo problema aggiungendo un controllo adeguato durante
+l'esportazione e, nel caso venga rilevato un conflitto, genera un nuovo nome per il 
+termine. In questo modo si evitano potenziali errori e conflitti durante l'esportazione 
+dei termini.
+
+Infine, l'esportazione non tiene traccia delle dipendenze tra i vari moduli Dedukti 
+processati. Di conseguenza i file esportati non hanno alcuna informazione che li
+lega alle loro dipendenze e pertanto non possono essere compilati in autonomia.
+
+Infine, l'esportazione non tiene traccia delle dipendenze tra i diversi moduli Dedukti
+elaborati. Di conseguenza, i file esportati non contengono alcuna informazione che li
+colleghi alle loro dipendenze, obbligando l'utente a ricostruirle manualmente.
+
+\subsection{Problemi teorici}
+Dal punto di vista teorico, le problematiche dell'esportazione possono essere attribuite
+alla differenza tra il $\lambda\Pi$-calcolo modulo e il calcolo delle costruzioni (co)induttive,
+e per tanto non sono risolvibili. In particolare, come evidenziato nella sezione 
+\ref{sottosezioneDedukti}, il $\lambda\Pi$-calcolo modulo non possiede le proprietà di normalizzazione
+e confluenza che, al contrario, sono presenti nel calcolo delle costruzioni (co)induttive.
+
+\paragraph{}
+La \textit{proof irrelevance}, è un concetto nella teoria dei tipi che afferma che la prova di una 
+proposizione o di un tipo non dovrebbe influire sul modo in cui questi vengono utilizzati.
+Ciò significa che due dimostrazioni diverse, di una stessa proposizione o tipo, possono essere
+considerate equivalenti e scambiate tra loro senza influire sulle conclusioni. In altre parole,
+una volta dimostrata una proprietà o un tipo, la specifica dimostrazione della sua validità 
+diventa irrilevante. Grazie alla proof irrelevance si può semplificare l'utilizzo dei tipi e delle
+proposizioni dimostrate, poiché non è necessario considerare le specifiche dimostrazioni ogni volta,
+quando si ragiona su di essi. 
+
+Durante l'esportazione, le informazioni sulla proof irrelenvance dei vari termini Matita vengono 
+completamente perse.
 
 \chapter{Da Dedukti a Matita}
 In questo capitolo viene illustrato il funzionamento del processo di importazione
@@ -499,7 +550,7 @@ a senso unico e qualcosa esportato da Krajono non può essere re-importato. In s
 battuta, il progetto consiste nell'implementazione di una funzionalità di \textit{import}
 che permetta a un utente di includere e utilizzare file Dedukti in Matita.
 
-\subsection{Il parser Dedukti}\label{sottoSezioneParserDedukti}
+\subsection{Il parser Dedukti}\label{sottosezioneParserDedukti}
 Per poter analizzare il file Dedukti, Matita sfrutta delle funzioni rese disponibili
 direttamente dal parser presente nel codice sorgente di Dedukti. Pertanto Dedukti è
 ora dipendenza di Matita. Tale parser è invocato dal motore di Matita durante il processo
@@ -623,7 +674,7 @@ Ad esempio
 \end{itemize}
 
 \subsection{Costanti CIC}
-Come descritto nella sezione \ref{sottoSezioneEncoding}, durante il processo di
+Come descritto nella sezione \ref{sottosezioneEncoding}, durante il processo di
 codifica, vengono utilizzate alcune costanti definite nel modulo Dedukti chiamato
 ``cic''. Per ricostruire i termini esportati utilizzando queste funzioni, la funzione
 responsabile della traduzione delle applicazioni si occupa anche di gestire ciascuna
@@ -689,7 +740,7 @@ tipo. Per capire quale regola tradurre Matita usa un ulteriore pragma:
 Grazie all'attributo \texttt{REF}, è possibile ricostruire l'oggetto punto fisso originale
 in quanto memorizza a quale funzione fa riferimento il corpo.
 
-\subsection{Tipi induttivi}\label{sottoSezioneTipiInduttivi}
+\subsection{Tipi induttivi}\label{sottosezioneTipiInduttivi}
 Ciascuna definizione di un tipo induttivo in Matita viene esportata usando
 una grande quantità di termini Dedukti e regole di riscrittura. In particolare
 \begin{itemize}
@@ -700,7 +751,7 @@ una grande quantità di termini Dedukti e regole di riscrittura. In particolare
     e per \textit{prop}. Queste fanno parte della codifica del pattern matching.
   \item Una lunga lista di costanti e regole di riscrittura. Queste rappresentano
     termini creati automaticamente dal runtime di Matita al momento della
-    definizione del tipo induttivo e per tanto possono essere ignorati.
+    definizione del tipo induttivo e pertanto possono essere ignorati.
 \end{itemize}
 
 \paragraph{La pragma}
@@ -727,7 +778,7 @@ Viene aggiunto inoltre l'attributo \texttt{LEFTNO} per preservare il numero di
 parametri sinistri.
 
 \subsection{Codice generato}
-Come descritto nella sezione \ref{sottoSezioneTipiInduttivi}, in alcuni casi
+Come descritto nella sezione \ref{sottosezioneTipiInduttivi}, in alcuni casi
 Matita genera automaticamente dei termini. Questi termini sono validi e vengono
 esportati. Tuttavia, è importante notare che non devono essere importati, poiché
 se si importano i termini che li hanno generati, Matita li ricreerà automaticamente.
