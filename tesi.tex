@@ -89,15 +89,15 @@ La logica, come il whisky, perde il suo effetto benefico se assunta in quantità
 \end{center}
 
 Dedukti è un software che agisce da type checker per definizioni, enunciati e prove
-codificati nel calcolo che implementa, il quale è sufficientemente espressivo da poter
+codificati nel calcolo che implementa. Quest'ultimo è sufficientemente espressivo da poter
 rappresentare anche altri calcoli. Questo rende Dedukti un framework logico con il 
 quale è possibile sviluppare un sistema di codifica che converta nel suo linguaggio
 le dimostrazioni scritte per altri proof assistant. 
-Inizialmente, si effettua un'analisi del processo di esportazione del codice da Matita
-a Dedukti. Matita è un assistente alla dimostrazione sviluppato presso l'Università di
-Bologna, basato sul calcolo delle costruzioni (co)-induttive. Successivamente, si illustra 
+Inizialmente si effettua un'analisi del processo di esportazione del codice da Matita
+a Dedukti, Matita è un assistente alla dimostrazione sviluppato presso l'Università di
+Bologna, basato sul calcolo delle costruzioni (co)-induttive. Successivamente si illustra 
 la funzionalità di importazione del codice Dedukti in Matita e si esaminano le sfide che
-si presentano nel ricostruire i termini originali di Matita a partire dal codice Dedukti 
+si presentano nel ricostruire i termini originali di Matita, a partire dal codice Dedukti 
 esportato in precedenza.
 
 
@@ -231,7 +231,7 @@ i termini della dimostrazione utilizzando un linguaggio di programmazione dotato
 un sistema di tipi avanzato, ottenendo alla fine una rappresentazione che può essere
 considerata equivalente a un programma. Successivamente esegue un processo di \textit{
   type checking} in cui verifica la correttezza degli assegnamenti di tipo del programma.
-Grazie all'isomorfismo di Curry-Howard questo, equivale a verificare la correttezza della 
+Grazie all'isomorfismo di Curry-Howard questo equivale a verificare la correttezza della 
 prova.
 
 Il numero di proof assistant è aumentato nel tempo. Ciò è sicuramente un segnale
@@ -252,12 +252,12 @@ un meta-sistema che consente di definire logiche e teoremi usando tali logiche.
 È sviluppato da alcuni ricercatori del \textit{Institut National de Recherche
 en Informatique et en Automatique} francese. Il software è open source, scritto
 nel linguaggio di programmazione OCaml e distribuito secondo i termini della
-CeCILL-B License. Uno degli obbiettivi principali di Dedukti è creare
+CeCILL-B License. Uno degli obiettivi principali di Dedukti è creare
 una connessione tra i diversi sistemi di dimostrazione assistita. Ciò significa
 che le dimostrazioni possono essere tradotte da un sistema all'altro, agevolandone
 lo scambio e il riutilizzo tra ambienti di lavoro diversi.
-Alcuni proof system, come ad esempio Coq e Hol Lite \footnote{Coq: https://github.com/Deducteam/CoqInE,\\ HOL Lite: https://arxiv.org/pdf/1507.08720.pdf}
-infatti godono già della possibilità di esportare e importare codice da e verso
+Infatti alcuni proof system, come ad esempio Coq e Hol Lite \footnote{Coq: https://github.com/Deducteam/CoqInE,\\ HOL Lite: https://arxiv.org/pdf/1507.08720.pdf},
+godono già della possibilità di esportare e importare codice da e verso
 Dedukti.
 
 \paragraph{$\lambda\Pi$-Calcolo modulo}
@@ -265,7 +265,7 @@ Alla base di questo logical framework c'è il $\lambda\Pi$-calcolo modulo (o
 semplicemente $\lambda\Pi$ modulo), un'estensione del $\lambda$-calcolo che introduce la \textit{tipizzazione dipendente} e le \textit{regole
 di riscrittura}. La prima consente la specifica di tipi complessi che dipendono
 dai valori delle espressioni, mentre le seconde consentono la trasformazione di
-un'espressione in un'altra seguendo determinate sostituzioni o manipolazioni.
+un'espressione in un'altra, seguendo determinate sostituzioni o manipolazioni.
 La sintassi del $\lambda\Pi$ modulo è la seguente
 \begin{center}
   \textit{Termini } \hspace{1pt} A, B, t, u \hspace{1pt} $::=$ Kind $\vert$ Type $\vert$ $\Pi$ x : A . B $\vert$ $\lambda$ x : A . B $\vert$ A B $\vert$ x \\
@@ -422,7 +422,7 @@ I punti fissi sono utili per definire funzioni ricorsive, mentre l'aggiunta del
 pattern matching permette di definire funzioni ricorsive strutturali. Un esempio
 concreto di ciò è l'implementazione di una funzione per calcolare la lunghezza
 di una lista, basata sul pattern matching per ragionare sulla struttura della 
-lista stessa.
+lista stessa:
 
 \begin{lstlisting}
 let rec len l on l $\stackrel{\text{def}}{=}$
@@ -509,7 +509,7 @@ def m : Nat -> Nat -> Nat.
 È interessante vedere all'opera le regole di riscrittura per definire la costante
 \texttt{m}. 
 
-In seguito si procede alla codifica degli universi. Innanzitutto, viene definito
+In seguito si procede alla codifica degli universi. Innanzitutto viene definito
 il tipo \texttt{Sort} per rappresentare le sorte e successivamente vengono definite
 la sorta \texttt{prop} e una funzione per rappresentare i diversi universi.
 
@@ -563,26 +563,22 @@ Questa funzionalità non è integrata nell'interfaccia grafica di Matita, né su
 tutte le funzionalità fornite da essa, come ad esempio la possibilità di verificare
 una dimostrazione passo dopo passo.
 
-Inoltre, Krajono non esegue l'\textit{escaping} delle \textit{keyword} di Dedukti,
+Inoltre Krajono non esegue l'\textit{escaping} delle \textit{keyword} di Dedukti,
 quindi quando viene esportato un termine con una keyword di Dedukti come nome, si
 ottiene del codice non funzionante. Matita risolve questo problema aggiungendo un controllo adeguato durante
 l'esportazione e, nel caso venga rilevato un conflitto, genera un nuovo nome per il 
 termine. In questo modo si evitano potenziali errori e conflitti durante l'esportazione 
 dei termini.
 
-Infine, l'esportazione non tiene traccia delle dipendenze tra i vari moduli Dedukti 
+Infine l'esportazione non tiene traccia delle dipendenze tra i vari moduli Dedukti 
 processati. Di conseguenza i file esportati non hanno alcuna informazione che li
-lega alle loro dipendenze e pertanto non possono essere compilati in autonomia.
-
-Infine, l'esportazione non tiene traccia delle dipendenze tra i diversi moduli Dedukti
-elaborati. Di conseguenza, i file esportati non contengono alcuna informazione che li
-colleghi alle loro dipendenze, obbligando l'utente a ricostruirle manualmente.
+lega alle loro dipendenze obbligando l'utente a ricostruirle manualmente.
 
 \subsection{Perdita di informazione}
 \paragraph{Normalizzazione e confluenza}
 Dal punto di vista teorico, le problematiche dell'esportazione possono essere attribuite
 alla differenza tra il $\lambda\Pi$-calcolo modulo e il calcolo delle costruzioni (co)induttive,
-e pertanto non sono risolvibili. In particolare, come evidenziato nella sezione 
+ pertanto non sono risolvibili. In particolare, come evidenziato nella sezione 
 \ref{sottosezioneDedukti}, il $\lambda\Pi$-calcolo modulo non possiede le proprietà di normalizzazione
 e confluenza che, al contrario, sono presenti nel calcolo delle costruzioni (co)induttive.
 
@@ -596,7 +592,7 @@ diventa irrilevante. Grazie alla proof irrelevance si può semplificare l'utiliz
 proposizioni dimostrate, poiché non è necessario considerare le specifiche dimostrazioni ogni volta,
 quando si ragiona su di essi. 
 
-Durante l'esportazione, le informazioni sulla proof irrelenvance dei vari termini Matita vengono 
+Durante l'esportazione, le informazioni sulla proof irrelevance dei vari termini Matita vengono 
 completamente perse.
 
 \paragraph{Costrutti di Matita}
@@ -616,7 +612,7 @@ di oggetti Matita precedentemente esportati.
 \section{Dedukti in Matita}
 Come visto nel capitolo \ref{capitoloExport}, Krajono consente l'esportazione del codice
 Matita verso Dedukti, tuttavia non è possibile fare il contrario. L'export è dunque 
-a senso unico e qualcosa esportato da Krajono non può essere re-importato. In seconda
+a senso unico, in altre parole, qualcosa esportato da Krajono non può essere re-importato. In seconda
 battuta, il progetto consiste nell'implementazione di una funzionalità di \textit{import}
 che permetta a un utente di includere e utilizzare file Dedukti in Matita.
 
@@ -629,7 +625,7 @@ per poter costruire l'albero di sintassi astratta. Se uno di questi file è un s
 Dedukti, allora il motore invoca il modulo OCaml responsabile dell'importazione. 
 Questo invoca a sua volta il parser Dedukti che legge il contenuto del file e restituisce
 uno stream di entry. Queste vengono analizzate nella loro struttura per poi costruire delle
-entry Matita equivalenti, da poi ritornare al motore.
+entry Matita equivalenti, da ritornare al motore.
 
 \section{L'import}
 
@@ -657,7 +653,7 @@ Entrambi i software fanno uso degli indici di De Brujin, una rappresentazione
 compatta delle variabili legate all'interno di un termine. Sono utilizzati per
 semplificare la manipolazione dei termini, eliminando la necessità di utilizzare
 nomi unici per le variabili e consentendo di eseguire operazioni come la 
-sostituzione e il confronto tra termini in modo efficente. 
+sostituzione e il confronto tra termini in modo efficiente. 
 Essendo un indice rappresentato da un intero la conversione è diretta.
 L'unica accortezza è il sommare $1$ a ciascun indice in quanto
 Dedukti fa uso di un sistema \textit{$0$ based} mentre Matita conta partendo
@@ -721,7 +717,7 @@ La codifica di un termine Matita può risultare in un blocco di termini Dedukti,
 le direttive pragma forniscono informazioni sull'inizio e la fine di tale blocco.
 In aggiunta, al fine di ricostruire correttamente i termini, a volte è necessario
 conservare attributi aggiuntivi e specificare a quale termine si riferiscono.
-Di conseguenza, le pragma contengono anche queste informazioni.
+Di conseguenza le pragma contengono anche queste informazioni.
 
 Le direttive vengono rappresentate internamente come stringhe di testo, e per
 semplificarne l'analisi viene utilizzato uno standard specifico:
@@ -749,7 +745,7 @@ di pragma in cui gli attributi fossero memorizzati in modo rigido e non
 del codice, ma dall'altra avrebbe reso difficoltosa la lettura e la scrittura di
 queste pragma.
 Inoltre, grazie all'aggiunta dei riferimenti sugli attributi, con questo approccio
-non si è vincolati a seguire una ordine rigido dei termini Dedukti all'interno di 
+non si è vincolati a seguire un ordine rigido dei termini Dedukti all'interno di 
 un blocco.
 
 \subsection{Costanti CIC}
@@ -860,7 +856,8 @@ parametri sinistri.
 Come descritto nella sezione \ref{sottosezioneTipiInduttivi}, in alcuni casi
 Matita genera automaticamente dei termini. Questi termini sono validi e vengono
 esportati. Tuttavia, è importante notare che non devono essere importati, poiché
-se si importano i termini che li hanno generati, Matita li ricreerà automaticamente.
+se erroneamente si importano i termini che li hanno generati, Matita li ricreerà 
+automaticamente.
 
 Per indicare che un blocco rappresenta un termine che è stato generato automaticamente,
 Matita aggiunge una pragma prima e dopo il blocco durante la fase di esportazione.
@@ -869,7 +866,7 @@ La pragma di apertura usata ha la seguente forma:
   \texttt{\#PRAGMA BEGIN GENRATED.}
 \end{center}
 
-mentre quella di chiusura:
+mentre quella di chiusura:i
 \begin{center}
   \texttt{\#PRAGMA END GENRATED.}
 \end{center}
@@ -898,11 +895,11 @@ Segue una lista di sviluppi possibili partendo da questo lavoro:
     non gestisce il pattern matching. Per la corretta ricostruzione di questo
     costrutto è necessario definire una nuova pragma per salvare le informazioni
     di cui si ha bisogno. Successivamente serve processare le varie costanti che
-    rappresentano il match, presenti nell'encoding di ciascun tipo induttivo.
+    rappresentano il match presenti nell'encoding di ciascun tipo induttivo.
     Infine, quando traducendo un termine Dedukti si trova l'invocazione di una
     delle \textit{costanti match}, bisogna costruire l'oggetto Matita, con tutti
     i suoi attributi.
-  \item \textit{Auto-inclusione dei file Dedukti}: attualmente, una limitazione
+  \item \textit{Auto-inclusione dei file Dedukti}: attualmente una limitazione
     riscontrata è che l'esportazione di Krajono consente solo l'importazione in
     Matita di termini Dedukti definiti nello stesso modulo. Un'area di possibile
     sviluppo futuro potrebbe riguardare l'aggiunta di un'informazione nel file
@@ -910,14 +907,14 @@ Segue una lista di sviluppi possibili partendo da questo lavoro:
     evitare errori durante l'importazione del file corrente.
   \item \textit{Integrazione con Matita}: per garantire una migliore esperienza
     utente nell'utilizzo delle funzionalità di importazione ed esportazione,
-    sarebbe opportuno integrarle più strettamente con Matita. In particolare,
+    sarebbe opportuno integrarle più strettamente con Matita. In particolare
     queste funzionalità dovrebbero essere integrate con le capacità di undo/redo
     per consentire l'annullamento o il ripristino delle modifiche effettuate.
     Inoltre, sarebbe importante integrarle con il meccanismo di serializzazione 
     e deserializzazione utilizzato da Matita per il salvataggio dei file verificati.
-    Infine, sarebbe consigliabile fornire un pulsante nella UI che consenta
+    Infine sarebbe consigliabile fornire un pulsante nella UI che consenta
     l'esecuzione dell'esportazione, in modo da non dover usare sempre 
-    il compilatore dalla riga di comando. 
+    il compilatore da riga di comando. 
 \end{itemize}
 
 \printbibliography
