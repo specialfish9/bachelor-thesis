@@ -1,6 +1,7 @@
 \documentclass[12pt,a4paper]{mimosis}
 \usepackage{newlfont}
 \usepackage{amsmath}
+\usepackage{epigraph}
 \usepackage{amsfonts}
 \usepackage{graphicx}
 \usepackage{listings}
@@ -43,9 +44,9 @@
   \end{center}
   \vspace{15mm}
   \begin{center}
-    {\LARGE{\bf DA MATITA A DEDUKTI}}\\
+    {\LARGE{\bf Da Matita a Dedukti}}\\
     \vspace{3mm}
-    {\LARGE{\bf E RITORNO}}\\
+    {\LARGE{\bf e ritorno}}\\
   \end{center}
   \vspace{40mm}
   \par
@@ -67,9 +68,34 @@
   \end{center}
 \end{titlepage}
 
+\begin{titlepage}
+	\thispagestyle{empty}
+	\topmargin=6.5cm
+	\raggedleft
+	\large
+	\em
+  \epigraph{
+    
+La logica, come il whisky, perde il suo effetto benefico se assunta in quantità
+  eccessive.
+    }
+  {Lord Dunsany}
+	\clearpage{\pagestyle{empty}\cleardoublepage}
+\end{titlepage}
 
-% \begin{abstract}
-% \end{abstract}
+
+\begin{center}
+  \textsc{Sommario}
+\end{center}
+Dedukti è un framework logico basato sul $\lambda\Pi$-calcolo modulo, progettato
+per consentire la codifica delle logiche dei diversi proof assistant al fine di
+facilitare la condivisione di teoremi e dimostrazioni. Matita, sviluppato presso
+l'Università di Bologna, è un proof assistant basato sul calcolo delle costruzioni
+(co)induttive. Inizialmente, viene introdotta l'implementazione di una funzionalità
+di esportazione del codice da Matita a Dedukti. Successivamente, viene fornita 
+una descrizione dell'implementazione di una funzionalità di importazione in Matita
+di codice Dedukti precedentemente esportato.
+
 
 \thispagestyle{empty}
 \tableofcontents
@@ -319,6 +345,30 @@ Mentre il sistema di tipi è definito dalle seguenti regole:
 \TrinaryInfC{$\Gamma \vdash$ x : B}
 \end{prooftree}
 
+\paragraph{Regole di riscrittura}
+Le regole di riscrittura definiscono come trasformare o riscrivere espressioni
+o termini secondo determinate regole specificate. Sono utili, ad esempio, per
+implementare il processo di $\beta$-riduzione, che rappresenta il passo di 
+applicazione di una funzione nei calcoli lambda:
+\begin{center}
+  ($\lambda$ x : A . f x) y $\hookrightarrow$ f y
+\end{center}
+Tuttavia, l'introduzione delle regole di riscrittura nel calcolo $\lambda\Pi$ 
+lo rende non \textit{consistente}. Questo perché non vengono garantite le proprietà
+di \textit{confluenza} e \textit{normalizzazione}.
+
+La proprietà di confluenza (o di Church-Rosser) afferma che se ci sono due riduzioni distinte o sequenze di riduzioni
+che possono essere applicate allo stesso termine, allora esiste un termine che
+è raggiungibile da entrambi i risultati, applicando sequenze (possibilmente vuote)
+di riduzioni aggiuntive. In altri termini, se esiste $a$ tale che $a \hookrightarrow^*$
+$b$ e $a \hookrightarrow^*c$ allora esiste $d$ tale che $b \hookrightarrow^*d$ e
+$c \hookrightarrow^* d$.
+
+La proprietà di normalizzazione invece afferma che ogni termine può essere 
+ridotto a una forma normale in un numero finito di passi di riduzione. In altre
+parole, non ci sono sequenze infinite di riduzioni per un termine specifico. 
+Questa proprietà è fondamentale per garantire la decidibilità di un calcolo. 
+
 \subsection{Matita}
 Matita è un  proof assistant in sviluppo nel dipartimento di Informatica Scienze
 e Ingegneria dell'Università di Bologna. È open source, scritto nel linguaggio di
@@ -426,7 +476,7 @@ Una volta costruiti, i termini Dedukti risultanti dalla codifica vengono inserit
 in una tabella hash, che alla fine del processo verrà scritta sul file \textit{.dk}
 di output.
 
-È importante notare come il processo di esporazione non è sempre un encoding
+È importante notare come il processo di esportazione non è sempre un encoding
 \textit{uno a uno}, ma determinati tipologie di termini Matita vengono codificati
 in più termini Dedukti.
 
@@ -524,7 +574,7 @@ poi assemblare il tutto in un oggetto Matita.
 \paragraph{Type e kind}
 Il $\lambda-\Pi$-modulo usato da Dedukti rappresenta gli universi usando
 \textit{type} e \textit{kind}: il primo rappresenta l'insieme dei tipi
-dei termini, mentre il secondo rappresente l'insieme dei tipi dei tipi.
+dei termini, mentre il secondo rappresenta l'insieme dei tipi dei tipi.
 Ad esempio il numero $5$ ha type $nat$ e $nat$ ha kind $*$.  (TODO)
 %TODO
 
@@ -533,7 +583,7 @@ Durante la codifica applicata durante l'esportazione con Krajono vengono perse
 informazioni su alcuni costrutti. Ad esempio, un tipo induttivo viene rappresentato
 attraverso un insieme di definizioni e regole di riscrittura, ma durante questo processo
 si perde l'informazione che si tratta di un tipo induttivo. Pertanto se si vuole 
-importare del codice Matita precedentemente esportato, non è sufficente quanto descritto
+importare del codice Matita precedentemente esportato, non è sufficiente quanto descritto
 nella sezione precedente. Per poter ricostruire i termini Matita originali è necessario
 applicare qualche accorgimento.
 
@@ -561,7 +611,7 @@ semplificarne l'analisi viene utilizzato uno standard specifico:
 Ad esempio
 \begin{itemize}
   \item  \texttt{\#PRAGMA FOO BAR=42 BAZ=43.} Significa: \textit{L'istruzione successiva è di tipo
-    \texttt{FOO} e posside un attributo \texttt{BAR} con valore \texttt{42} e 
+    \texttt{FOO} e possiede un attributo \texttt{BAR} con valore \texttt{42} e 
     un attributo \texttt{BAZ} con valore \texttt{43}}.
 
   \item  \texttt{\#PRAGMA BEGIN BLOCK GREETINGS:world=hello.} Significa: \textit{
@@ -572,7 +622,7 @@ Ad esempio
     \texttt{BLOCK}}.
 \end{itemize}
 
-\subsection{Costanti cic}
+\subsection{Costanti CIC}
 Come descritto nella sezione \ref{sottoSezioneEncoding}, durante il processo di
 codifica, vengono utilizzate alcune costanti definite nel modulo Dedukti chiamato
 ``cic''. Per ricostruire i termini esportati utilizzando queste funzioni, la funzione
@@ -636,7 +686,7 @@ tipo. Per capire quale regola tradurre Matita usa un ulteriore pragma:
   \texttt{\#PRAGMA FIXPOINT\_BODY REF=name.}
 \end{center}
 
-Grazie all'attributo \texttt{REF}, è possibile ricostruire l'oggetto puntofisso originale
+Grazie all'attributo \texttt{REF}, è possibile ricostruire l'oggetto punto fisso originale
 in quanto memorizza a quale funzione fa riferimento il corpo.
 
 \subsection{Tipi induttivi}\label{sottoSezioneTipiInduttivi}
@@ -694,18 +744,80 @@ mentre quella di chiusura:
   \texttt{\#PRAGMA END GENRATED.}
 \end{center}
 
-In questo modo, durante l'importazione, Matita è in grado di individurare i
+In questo modo, durante l'importazione, Matita è in grado di individuare i
 blocchi generati e di ignorarli.
 
 
- \chapter{Conclusioni \& sviluppi futuri}
- aisdjsfjd
+\chapter{Conclusioni}
+\section{Conclusioni}
+Grazie a questo lavoro la funzionalità di esportazione presente in Krajono
+è disponibile anche sul Matita baseline. Oltre a ciò, è anche possibile
+importare delle dimostrazioni Dedukti in Matita. Nel caso in cui una dimostrazione
+rappresenti la codifica di una precedentemente esportata, vengono parzialmente
+ricostruiti i termini originali.
+
+Anche se il lavoro svolto sull'importazione non ha coperto il caso del pattern
+matching, tutti gli altri casi sono stati largamente testati, prevedendo anche
+casi limite. La mancanza della traduzione del costrutto di pattern matching fa 
+si che certe definizioni che lo usano falliscano il controllo di tipo.
+
+\section{Sviluppi futuri}
+Segue una lista di sviluppi possibili partendo da questo lavoro:
+\begin{itemize}
+  \item \textit{Pattern matching}: la funzionalità di importazione attualmente
+    non gestisce il pattern matching. Per la corretta ricostruzione di questo
+    costrutto è necessario definire una nuova pragma per salvare le informazioni
+    di cui si ha bisogno. Successivamente serve processare le varie costanti che
+    rappresentano il match, presenti nell'encoding di ciascun tipo induttivo.
+    Infine, quando traducendo un termine Dedukti si trova l'invocazione di una
+    delle \textit{costanti match}, bisogna costruire l'oggetto Matita, con tutti
+    i suoi attributi.
+  \item \textit{Auto-inclusione dei file Dedukti}: attualmente, una limitazione
+    riscontrata è che l'esportazione di Krajono consente solo l'importazione in
+    Matita di termini Dedukti definiti nello stesso modulo. Un'area di possibile
+    sviluppo futuro potrebbe riguardare l'aggiunta di un'informazione nel file
+    di output che consenta di identificare i file da importare in precedenza per
+    evitare errori durante l'importazione del file corrente.
+  \item \textit{Integrazione con Matita}: per garantire una migliore esperienza
+    utente nell'utilizzo delle funzionalità di importazione ed esportazione,
+    sarebbe opportuno integrarle più strettamente con Matita. In particolare,
+    queste funzionalità dovrebbero essere integrate con le capacità di undo/redo
+    per consentire l'annullamento o il ripristino delle modifiche effettuate.
+    Inoltre, sarebbe importante integrarle con il meccanismo di serializzazione 
+    e deserializzazione utilizzato da Matita per il salvataggio dei file verificati.
+    Infine, sarebbe consigliabile fornire un pulsante nella UI che consenta
+    l'esecuzione dell'esportazione, in modo da non dover usare sempre 
+    il compilatore dalla riga di comando. 
+\end{itemize}
 
 \printbibliography
 
+\chapter*{Ringraziamenti}
+Questo è il coronamento simbolico di tre anni di sforzi e sacrifici, miei ma anche di chi mi
+è stato vicino.
 
-% bio
-% http://www.cs.unibo.it/~ricciott/PAPERS/system_description2011_draft.pdf
+Prima di tutto ringrazio la mia famiglia che, anche se fisicamente sono a 150 chilometri
+da me, spiritualmente mi sono sempre stati vicini.
+Ringrazio in particolare mamma Cristina e papà Teodoro per avermi dato questa grande 
+possibilità.
+
+Ringrazio il Professor Claudio Sacerdoti Coen, mio relatore, per essere stato estremamente
+disponibile con me, e per avermi fatto conoscere parte delle meraviglie che riserva la
+materia misteriosa e fantastica che è la Logica.
+
+Ringrazio Clarissa, la mia supercoinquilina turing-completa, per essere una
+sicurezza e per avermi sopportato. Ti devo molto, questa laurea è anche tua.
+
+Grazie a Kishi per essere carino.
+
+Ringrazio i miei amici di su e di giù. Grazie per tutte le avventure che abbiamo 
+vissuto in questi anni. Ringrazio Alvise, Andreea, Elena, Erik,
+Federica, Gabriele, Luca, Nicolò, Paolo B., Paolo C., Rickie, e tutti gli altri.
+
+Infine ringrazio i miei colleghi del \textit{Team Mobile} e dell'\textit{Incubator}
+per avermi insegnato tantissimo durante questi anni. In particolare ringrazio Alexandru e Marco per
+avermi messo alla prova e avermi dato fiducia.
+
 \end{document}
 
 % cose che si potrebbero eventualmente fare
@@ -714,5 +826,8 @@ blocchi generati e di ignorarli.
 % aggiungere sul puntofisso e sul match
 % aggiungere immagini su engine -> parser -> import -> engine
 % aggiungere immagine su tutti che puntano verso dk
-% sulle regole di riscrittura
+
+% bio
+% https://it.abcdef.wiki/wiki/Church%E2%80%93Rosser_theorem
+% http://www.cs.unibo.it/~ricciott/PAPERS/system_description2011_draft.pdf
 
