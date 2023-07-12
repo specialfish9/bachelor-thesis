@@ -1,0 +1,25 @@
+1. I proof assistant
+- Cosa sono
+- A cosa servono
+- Come funzionano
+2. Dedukti
+- Cos'è
+- Perché è stato creato
+- Veloce/issima introduzione al lambda pi modulo
+3. Matita
+- Cos'è
+- Veloce/issima comparazione tra cic e lambda pi
+4. Krajono
+- Cos'è
+5. Esportazine
+- Velocissima introduzione a come funziona
+- I problemi che ha
+- Come è stato integrato in Matita
+6. Importazione
+- I termini Dedukti
+- Pragma
+- Tipi induttivi
+- Punti fissi
+7. Conclusioni
+8. Lavori futuri
+
