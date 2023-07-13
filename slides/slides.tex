@@ -2,6 +2,7 @@
 \usepackage[italian]{babel}
 \usepackage{graphicx}
 \usepackage{bm}
+\usepackage{listings}
 \usepackage{hyperref}
 \usepackage{hyperref}
 \usepackage[italian]{babel}
@@ -11,6 +12,33 @@
 
 \usefonttheme{serif}
 \graphicspath{ {./pic/} }
+
+\definecolor{primary}{HTML}{977478}
+\definecolor{secondary}{HTML}{747897}
+\definecolor{tertiary}{HTML}{789774}
+
+\lstdefinestyle{mystyle}{
+    commentstyle=\bfseries\color{tertiary},
+    keywordstyle=\bfseries\color{secondary},
+    numberstyle=\tiny\color{secondary},
+    stringstyle=\color{secondary},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    morekeywords={include,inductive,Term,type,z,prod,Univ},
+    morecomment=[l]{\#},
+    mathescape=true
+}
+
+\lstset{style=mystyle}
 
 \newcommand{\makepart}[1]{ % For convenience
 \part{#1} \frame{\partpage}
@@ -58,7 +86,15 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 % \includegraphics[scale=0.30]{agda.png}
 \end{center}
 \end{frame}
-\begin{frame}{Isomorfismo}
+\begin{frame}{Isomorfismo di Curry-Howard}
+\begin{center}
+  \begin{tabular}{ c  c  c }
+    \textbf{\alert{LOGICA}} &  & \textbf{\alert{TEORIA DEI TIPI}} \\ \\
+    Proposizioni & $\Leftrightarrow$ & Tipi \\ \\
+    Dimostrazioni & $\Leftrightarrow$ & Programmi \\ \\
+    Verifica di una dimostrazione & $\Leftrightarrow$ & Verifica di tipo \\ \\
+  \end{tabular}
+\end{center}
 \end{frame}
 
 
@@ -78,9 +114,6 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 
 \begin{column}{.5\textwidth}
 \includegraphics[scale=1]{dedukti2.png}
-\begin{center}
-    \href{https://deducteam.github.io/}{https://deducteam.github.io/}
-\end{center}
 \end{column}
 \end{columns}
 
@@ -99,7 +132,6 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
   \end{column}
   \begin{column}{.5\textwidth}
     \includegraphics[scale=0.30]{matita.png}
-  \href{https://github.com/sacerdot/matita}{https://github.com/sacerdot/matita}
   \end{column}
 \end{columns}
 \end{frame}
@@ -119,7 +151,6 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \end{column}
 \begin{column}{.5\textwidth}
 \includegraphics[scale=0.40]{m2d.png}
-  \href{https://github.com/Deducteam/Krajono}{https://github.com/Deducteam/Krajono}
 \end{column}
 \end{columns}
 
@@ -135,28 +166,67 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 
 \end{frame}
 
-\section{Le pragma}
+\section{Importazione: problemi}
 \begin{frame}
 \begin{itemize}
-  \item \alert{\textbf{Problema}} Durante la codifica vengono perse informazioni necessarie
-    alla ricostruzione dei termini originali.
-  \vspace{1em}
-  \item \alert{\textbf{Soluzione}} Preservare tali informazioni usando le \textit{pragma}.
+  \item \alert{\textbf{Problema}} In Dedukti le proprietà di \textit{confluenza} e 
+    \textit{normalizzazione} non sono garantite.
 \end{itemize}
-  \vspace{3em}
-  \begin{exampleblock}{Esempio}
-\begin{center}
-  \textbf{\texttt{\#PRAMGA BEGIN INDUCTIVE NAME=nat CONS:nat=O CONS:nat=S}}
-\end{center}
-  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Confluenza e normalizzazione}
+  \begin{block}{Definizione (Confluenza)} 
+    Dato un termine $a$, se esistono due regole di riscrittura $a \hookrightarrow^* b$ e 
+    $a \hookrightarrow^*c$, allora esiste un termine $d$ tale che $b \hookrightarrow^* d$
+    e $c \hookrightarrow^* d$.
+  \end{block}
+  \begin{center}
+    \includegraphics[scale=0.40]{confluenza.png}
+  \end{center}
+  \begin{block}{Definizione (Normalizzazione)} 
+    Dato un termine, questo può essere ridotto al più un numero finito di volte.
+  \end{block}
 \end{frame}
 
 \begin{frame}
+\begin{itemize}
+  \item \alert{\textbf{Problema}} In Dedukti le proprietà di \textit{confluenza} e 
+    \textit{normalizzazione} non sono garantite.
+  \vspace{1em}
+  \item \alert{\textbf{Problema}} Durante la codifica vengono perse informazioni necessarie
+    alla ricostruzione dei termini originali.
+\end{itemize}
+\end{frame}
 
+\begin{frame}[fragile]{Pragma}
+Per preservare tali informazioni vengono usate le \textit{pragma}:
+  \vspace{1em}
+  \begin{lstlisting}
+#PRAMGA BEGIN INDUCTIVE NAME=nat LEFTNO=0 CONS:nat=O CONS:nat=S.
+
+nat : cic.Univ (cic.type cic.z).
+
+O : cic.Term (cic.type cic.z) matita_test_nat.nat.
+      
+S : cic.Term (cic.type cic.z) (cic.prod (cic.type cic.z) (cic.type cic.z)
+      matita_test_nat.nat(__ : cic.Term (cic.type cic.z)
+        matita_esperimento_nat.nat => matita_test_nat.nat)).
+      
+#PRAMGA END INDUCTIVE.
+  \end{lstlisting}
 \end{frame}
 
 \section{Conclusioni}
-\begin{frame}
+\begin{frame}{Link utili}
+
+\begin{itemize}
+  \item \alert{Matita}: \href{https://github.com/sacerdot/matita}{https://github.com/sacerdot/matita}
+  \vspace{1em}
+  \item \alert{Dedukti}: \href{https://deducteam.github.io/}{https://deducteam.github.io/}
+  \vspace{1em}
+  \item \alert{Krajono}: \href{https://github.com/Deducteam/Krajono}{https://github.com/Deducteam/Krajono}
+  \vspace{1em}
+\end{itemize}
 \end{frame}
 
 \end{document}
