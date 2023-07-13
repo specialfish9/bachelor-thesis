@@ -76,14 +76,11 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
   \tableofcontents
 \end{frame}
 
-\section{I proof assistant}
-\begin{frame}
+\section{Dedukti e Matita}
+\subsection{I proof assistant}
+\begin{frame}{I proof assistant}
 \begin{center}
-\includegraphics[scale=0.70]{coq.png}
-\includegraphics[scale=0.30]{matita.png}
-\end{center}
-\begin{center}
-% \includegraphics[scale=0.30]{agda.png}
+\includegraphics[scale=0.4]{proofAssistant.png}
 \end{center}
 \end{frame}
 \begin{frame}{Isomorfismo di Curry-Howard}
@@ -97,9 +94,10 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \end{center}
 \end{frame}
 
+%TODO slide sull'interoperabilita'
 
-\section{Dedukti}
-\begin{frame}
+\subsection{Dedukti}
+\begin{frame}{Dedukti}
 \begin{columns}
 
 \begin{column}{.5\textwidth}
@@ -117,11 +115,12 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \end{column}
 \end{columns}
 
+%TODO slide su lambdapi
 
 \end{frame}
 
-\section{Matita}
-\begin{frame}
+\subsection{Matita}
+\begin{frame}{Matita}
 \begin{columns}
   \begin{column}{.5\textwidth}
     \begin{itemize}
@@ -131,13 +130,18 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
     \end{itemize}
   \end{column}
   \begin{column}{.5\textwidth}
-    \includegraphics[scale=0.30]{matita.png}
+    \begin{center}
+        \includegraphics[scale=0.30]{matita.png}
+    \end{center}
   \end{column}
 \end{columns}
 \end{frame}
 
-\section{Krajono}
-\begin{frame}
+%TODO slide su cic
+
+\section{Esportazione}
+\subsection{Krajono}
+\begin{frame}{Krajono}
 
 \begin{columns}
 \begin{column}{.5\textwidth}
@@ -156,8 +160,8 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 
 \end{frame}
 
-\section{Esportazione}
-\begin{frame}
+\subsection{La codifica}
+\begin{frame}{La codifica}
   \includegraphics[scale=0.30]{export.png}
 \end{frame}
 
@@ -166,8 +170,8 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 
 \end{frame}
 
-\section{Importazione: problemi}
-\begin{frame}
+\subsection{Problemi}
+\begin{frame}{Problemi}
 \begin{itemize}
   \item \alert{\textbf{Problema}} In Dedukti le proprietà di \textit{confluenza} e 
     \textit{normalizzazione} non sono garantite.
@@ -188,7 +192,7 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
   \end{block}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Problemi}
 \begin{itemize}
   \item \alert{\textbf{Problema}} In Dedukti le proprietà di \textit{confluenza} e 
     \textit{normalizzazione} non sono garantite.
@@ -198,6 +202,7 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \end{itemize}
 \end{frame}
 
+\subsection{Pragma}
 \begin{frame}[fragile]{Pragma}
 Per preservare tali informazioni vengono usate le \textit{pragma}:
   \vspace{1em}
@@ -217,9 +222,13 @@ S : cic.Term (cic.type cic.z) (cic.prod (cic.type cic.z) (cic.type cic.z)
 \end{frame}
 
 \section{Conclusioni}
+\begin{frame}{Conclusioni}
+\end{frame}
 \begin{frame}{Link utili}
 
 \begin{itemize}
+%TODO coq
+%TODO agda
   \item \alert{Matita}: \href{https://github.com/sacerdot/matita}{https://github.com/sacerdot/matita}
   \vspace{1em}
   \item \alert{Dedukti}: \href{https://deducteam.github.io/}{https://deducteam.github.io/}
