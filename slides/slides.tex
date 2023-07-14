@@ -95,19 +95,20 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \subsection{I proof assistant}
 \begin{frame}{I proof assistant}
 \begin{center}
-\includegraphics[scale=0.5]{proofAssistant.png}
+\includegraphics[scale=0.3]{proofAssistant.png}
 \end{center}
 \end{frame}
-\begin{frame}{Isomorfismo di Curry-Howard}
-\begin{center}
-  \begin{tabular}{ c  c  c }
-    \textbf{\alert{LOGICA}} &  & \textbf{\alert{TEORIA DEI TIPI}} \\ \\
-    Proposizioni & $\Leftrightarrow$ & Tipi \\ \\
-    Dimostrazioni & $\Leftrightarrow$ & Programmi \\ \\
-    Verifica di una dimostrazione & $\Leftrightarrow$ & Verifica di tipo \\ \\
-  \end{tabular}
-\end{center}
-\end{frame}
+
+% \begin{frame}{Isomorfismo di Curry-Howard}
+% \begin{center}
+%   \begin{tabular}{ c  c  c }
+%     \textbf{\alert{LOGICA}} &  & \textbf{\alert{TEORIA DEI TIPI}} \\ \\
+%     Proposizioni & $\Leftrightarrow$ & Tipi \\ \\
+%     Dimostrazioni & $\Leftrightarrow$ & Programmi \\ \\
+%     Verifica di una dimostrazione & $\Leftrightarrow$ & Verifica di tipo \\ \\
+%   \end{tabular}
+% \end{center}
+% \end{frame}
 
 \begin{frame}{I proof assistant}
   \begin{center}
@@ -121,9 +122,11 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 
 \begin{column}{.5\textwidth}
 \begin{itemize}
+  \item Sviluppato dall'INRIA
+  \vspace{1.5em}
   \item Framework logico
   \vspace{1.5em}
-  \item Implementa logiche e teoremi
+  \item Linguaggio in grado di implementare logiche e teoremi
   \vspace{1.5em}
   \item Basato sul $\lambda\Pi$-calcolo modulo
 \end{itemize}
@@ -146,9 +149,9 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \pause
 \begin{exampleblock}{Esempio (Regole di riscrittura)}
 \begin{center}
-  $sum$ $n$ $0$ $\hookrightarrow$ $n$ \\
+  $n+0$ $\hookrightarrow$ $n$ \\
   \vspace{1em}
-  $prod $ $n$ $0$ $\hookrightarrow$ $0$
+  $n \cdot 0$ $\hookrightarrow$ $0$
 \end{center}
 \end{exampleblock}
 \end{frame}
@@ -158,7 +161,7 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \begin{columns}
   \begin{column}{.5\textwidth}
     \begin{itemize}
-      \item Proof assistant sviluppato all'Università di Bologna
+      \item Proof assistant in sviluppo all'Università di Bologna
       \vspace{1.5em}
       \item Basato sul calcolo delle \textit{costruzioni (co)induttive}
     \end{itemize}
@@ -195,7 +198,7 @@ let rec plus n m on n $\stackrel{\text{def}}{=}$
 
 \end{frame}
 
-\makesection{Esportazione}
+\makesection{Da Matita a Dedukti}
 \subsection{Krajono}
 \begin{frame}{Krajono}
 
@@ -221,7 +224,7 @@ let rec plus n m on n $\stackrel{\text{def}}{=}$
   \includegraphics[scale=0.40]{export.png}
 \end{frame}
 
-\makesection{Importazione}
+\makesection{Da Dedukti a Matita}
 \begin{frame}
   \begin{center}
     \includegraphics[scale=0.50]{m2d2m.png}
@@ -295,6 +298,8 @@ S : cic.Term (cic.type cic.z) (cic.prod (cic.type cic.z) (cic.type cic.z)
 \begin{itemize}
   \item Aggiungere ricostruzione del costrutto di \textit{pattern matching}
   \vspace{1em}
+\item Auto-inclusione dei file Dedukti 
+  \vspace{1em}
 \item Integrare le funzionalità di importazione/esportazione con la UI
   di Matita
 \end{itemize}
@@ -315,4 +320,13 @@ S : cic.Term (cic.type cic.z) (cic.prod (cic.type cic.z) (cic.type cic.z)
 \end{itemize}
 \end{frame}
 
+  \setbeamercolor{alerted text}{fg=primary}
+  \fontsize{21pt}{7.2}\selectfont
+  \begin{frame}{\ }
+\begin{center}
+    \alert{FINE}
+\end{center}
+  \end{frame}
+  \fontsize{12pt}{15}\selectfont
+  \setbeamercolor{alerted text}{fg=secondary}
 \end{document}
