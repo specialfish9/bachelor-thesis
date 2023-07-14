@@ -33,7 +33,7 @@
     showstringspaces=false,
     showtabs=false,                  
     tabsize=2,
-    morekeywords={include,inductive,Term,type,z,prod,Univ},
+    morekeywords={include,inductive,Term,type,z,prod,Univ,let,rec,on,match,with},
     morecomment=[l]{\#},
     mathescape=true
 }
@@ -41,8 +41,21 @@
 \lstset{style=mystyle}
 
 \newcommand{\makepart}[1]{ % For convenience
-\part{#1} \frame{\partpage}
+\part{#1} \frame{
+  \partpage}
 }
+
+\newcommand{\makesection}[1]{
+  \section{#1}
+  \setbeamercolor{alerted text}{fg=primary}
+  \fontsize{21pt}{7.2}\selectfont
+  \begin{frame}{\ }
+    \alert{#1}
+  \end{frame}
+  \fontsize{12pt}{15}\selectfont
+  \setbeamercolor{alerted text}{fg=secondary}
+}
+
 \usepackage{styles/elegantmacros}
 \usepackage{styles/bussproofs}
 \usefolder{styles}
@@ -65,7 +78,7 @@
 \institute{
 Relazione per il corso 85001 - Metodi logici per la Filosofia \\
     Alma Mater Studiorum, Università di Bologna}
-\date{\today}
+\date{19 Luglio 2023}
 
 \begin{document}
 \begin{frame}
@@ -73,14 +86,16 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \end{frame}
 
 \begin{frame}{Indice}
-  \tableofcontents
+  \tableofcontents[]
 \end{frame}
 
-\section{Dedukti e Matita}
+
+\makesection{Dedukti e Matita}
+
 \subsection{I proof assistant}
 \begin{frame}{I proof assistant}
 \begin{center}
-\includegraphics[scale=0.4]{proofAssistant.png}
+\includegraphics[scale=0.5]{proofAssistant.png}
 \end{center}
 \end{frame}
 \begin{frame}{Isomorfismo di Curry-Howard}
@@ -94,7 +109,11 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \end{center}
 \end{frame}
 
-%TODO slide sull'interoperabilita'
+\begin{frame}{I proof assistant}
+  \begin{center}
+    \includegraphics[scale=0.25]{inter.png}
+  \end{center}
+\end{frame}
 
 \subsection{Dedukti}
 \begin{frame}{Dedukti}
@@ -114,9 +133,24 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \includegraphics[scale=1]{dedukti2.png}
 \end{column}
 \end{columns}
+\end{frame}
 
-%TODO slide su lambdapi
-
+\begin{frame}{$\lambda\Pi$-calcolo modulo}
+  Estende il \textit{$\lambda$-calcolo tipizzato} aggiungendo
+\begin{itemize}
+  \vspace{1em}
+  \item Tipi dipendenti 
+  \vspace{1em}
+  \item Regole di riscrittura
+\end{itemize}
+\pause
+\begin{exampleblock}{Esempio (Regole di riscrittura)}
+\begin{center}
+  $sum$ $n$ $0$ $\hookrightarrow$ $n$ \\
+  \vspace{1em}
+  $prod $ $n$ $0$ $\hookrightarrow$ $0$
+\end{center}
+\end{exampleblock}
 \end{frame}
 
 \subsection{Matita}
@@ -137,9 +171,31 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \end{columns}
 \end{frame}
 
-%TODO slide su cic
+\begin{frame}[fragile]{Calcolo delle costruzioni (co)induttive}
+Caratteriazzato dalla possibilità di definire 
+\begin{itemize}
+  \item \textit{tipi induttivi}
+  \item \textit{punto fissi}
+  \item \textit{pattern matching}
+\end{itemize}
 
-\section{Esportazione}
+\begin{center}
+  \begin{lstlisting}[numbers=none]
+inductive nat: Type[0] $\stackrel{\text{def}}{=}$
+   O : nat
+ | S : nat $\rightarrow$ nat.
+
+let rec plus n m on n $\stackrel{\text{def}}{=}$
+ match n with
+ [ O $\Rightarrow$ m
+ | S x $\Rightarrow$ S (plus x m)
+ ].
+\end{lstlisting}
+\end{center}
+
+\end{frame}
+
+\makesection{Esportazione}
 \subsection{Krajono}
 \begin{frame}{Krajono}
 
@@ -148,7 +204,7 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 \begin{itemize}
   \item \textit{Fork } di Matita 
   \vspace{1.5em}
-  \item Esportazione verso Dedukti
+  \item Aggiunge l'esportazione verso Dedukti
   \vspace{1.5em}
   \item Non più supportato
 \end{itemize}
@@ -162,12 +218,14 @@ Relazione per il corso 85001 - Metodi logici per la Filosofia \\
 
 \subsection{La codifica}
 \begin{frame}{La codifica}
-  \includegraphics[scale=0.30]{export.png}
+  \includegraphics[scale=0.40]{export.png}
 \end{frame}
 
-\section{Importazione}
+\makesection{Importazione}
 \begin{frame}
-
+  \begin{center}
+    \includegraphics[scale=0.50]{m2d2m.png}
+  \end{center}
 \end{frame}
 
 \subsection{Problemi}
@@ -221,19 +279,38 @@ S : cic.Term (cic.type cic.z) (cic.prod (cic.type cic.z) (cic.type cic.z)
   \end{lstlisting}
 \end{frame}
 
-\section{Conclusioni}
+\makesection{Conclusioni}
 \begin{frame}{Conclusioni}
+\begin{itemize}
+  \item È possibile esportare i termini Matita nel linguaggio di Dedukti
+  \vspace{1em}
+  \item È possibile importare in Matita termini Dedukti
+  \vspace{1em}
+\item È possibile reimportare in Matita termini Dedukti precedentemente 
+  esportati da Matita, ricostruendo (in parte) l'oggetto Matita originale
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Lavori futuri}
+\begin{itemize}
+  \item Aggiungere ricostruzione del costrutto di \textit{pattern matching}
+  \vspace{1em}
+\item Integrare le funzionalità di importazione/esportazione con la UI
+  di Matita
+\end{itemize}
 \end{frame}
 \begin{frame}{Link utili}
 
 \begin{itemize}
-%TODO coq
-%TODO agda
   \item \alert{Matita}: \href{https://github.com/sacerdot/matita}{https://github.com/sacerdot/matita}
   \vspace{1em}
   \item \alert{Dedukti}: \href{https://deducteam.github.io/}{https://deducteam.github.io/}
   \vspace{1em}
   \item \alert{Krajono}: \href{https://github.com/Deducteam/Krajono}{https://github.com/Deducteam/Krajono}
+  \vspace{1em}
+  \item \alert{Coq}: \href{https://coq.inria.fr/}{https://coq.inria.fr/}
+  \vspace{1em}
+  \item \alert{Agda}: \href{https://wiki.portal.chalmers.se/agda/pmwiki.php}{https://wiki.portal.chalmers.se/agda/pmwiki.php}
   \vspace{1em}
 \end{itemize}
 \end{frame}
